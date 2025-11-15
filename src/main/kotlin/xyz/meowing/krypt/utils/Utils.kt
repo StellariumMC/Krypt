@@ -6,6 +6,13 @@ import java.awt.Color
 object Utils {
     inline val partialTicks get() = client.deltaTracker.getGameTimeDeltaPartialTick(true)
 
+    private val formatRegex = "[§&][0-9a-fk-or]".toRegex()
+
+    fun String?.removeFormatting(): String {
+        if (this == null) return ""
+        return this.replace(formatRegex, "")
+    }
+
     fun Map<*, *>.toColorFromMap(): Color? {
         return try {
             val r = (get("r") as? Number)?.toInt() ?: 255

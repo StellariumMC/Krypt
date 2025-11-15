@@ -12,7 +12,8 @@ import java.util.UUID
 class DungeonPlayer(
     val name: String,
     dungeonClass: DungeonClass? = null,
-    classLevel: Int? = null
+    classLevel: Int? = null,
+    cataLevel: Int? = null
 ) {
     var iconX: Double? = null
     var iconZ: Double? = null
@@ -28,6 +29,9 @@ class DungeonPlayer(
         internal set
 
     var classLevel: Int? = classLevel
+        internal set
+
+    var cataLevel: Int? = cataLevel
         internal set
 
     var dead: Boolean = false
@@ -70,5 +74,5 @@ class DungeonPlayer(
     fun getGreenChecks(): MutableMap<String, RoomClearInfo> = clearedRooms["GREEN"] ?: mutableMapOf()
     fun getWhiteChecks(): MutableMap<String, RoomClearInfo> = clearedRooms["WHITE"] ?: mutableMapOf()
 
-    internal fun missingData(): Boolean = dungeonClass == null || classLevel == null
+    internal fun missingData(): Boolean = dungeonClass == null || classLevel == null || cataLevel == null
 }

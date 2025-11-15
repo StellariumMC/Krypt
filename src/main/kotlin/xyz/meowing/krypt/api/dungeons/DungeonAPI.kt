@@ -8,6 +8,7 @@ import tech.thatgravyboat.skyblockapi.api.data.Perk
 import tech.thatgravyboat.skyblockapi.utils.extentions.getTexture
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.find
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findOrNull
+import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findThenNull
 import tech.thatgravyboat.skyblockapi.utils.regex.matchWhen
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import xyz.meowing.knit.api.KnitPlayer
@@ -35,7 +36,9 @@ import xyz.meowing.krypt.events.core.ChatEvent
 import xyz.meowing.krypt.events.core.DungeonEvent
 import xyz.meowing.krypt.events.core.EntityEvent
 import xyz.meowing.krypt.events.core.LocationEvent
+import xyz.meowing.krypt.events.core.TablistEvent
 import xyz.meowing.krypt.events.core.TickEvent
+import kotlin.math.floor
 
 @Module
 object DungeonAPI {
@@ -60,6 +63,8 @@ object DungeonAPI {
     private val mimicRegex = Regex("""^Party > (?:\[[\w+]+] )?\w{1,16}: (.*)$""")
 
     private val mimicMessages = listOf("mimic dead", "mimic dead!", "mimic killed", "mimic killed!", $$"$skytils-dungeon-score-mimic$")
+
+    private val cataRegex = Regex("^ Catacombs (?<level>\\d+):")
 
     val rooms = Array<Room?>(36) { null }
     val doors = Array<Door?>(60) { null }
@@ -123,6 +128,9 @@ object DungeonAPI {
     val classLevel: Int
         get() = ownPlayer?.classLevel ?: 0
 
+    val cataLevel: Int
+        get() = ownPlayer?.cataLevel ?: 0
+
     val isPaul: Boolean
         get() = Perk.EZPZ.active
 
@@ -130,6 +138,18 @@ object DungeonAPI {
 
     init {
         var tickCount = 0
+
+        EventBus.registerIn<TablistEvent.Change>(SkyBlockIsland.DUNGEON_HUB) { event ->
+            val fourthColumn = event.new.getOrNull(3) ?: return@registerIn
+
+            fourthColumn.forEach { line ->
+                cataRegex.findThenNull(line.stripped, "level") { (level) ->
+                    if (level.toIntOrNull() == null || level.toIntOrNull() == cataLevel) return@findThenNull
+
+                    ownPlayer?.cataLevel = level.toInt()
+                } ?: return@registerIn
+            }
+        }
 
         EventBus.registerIn<LocationEvent.AreaChange>(SkyBlockIsland.THE_CATACOMBS) { event ->
             dungeonFloorRegex.find(event.new.name, "floor") { (f) ->
@@ -351,5 +371,10 @@ object DungeonAPI {
         }
         uniqueRooms += room1
         room1.update()
+    }
+
+    fun getMageReduction(cooldown: Double): Double {
+        val multiplier = if (uniqueClass) 1 else 2
+        return cooldown * (0.75 - (floor(classLevel / 2.0) / 100.0) * multiplier)
     }
 }
