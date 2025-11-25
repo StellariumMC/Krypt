@@ -161,6 +161,10 @@ class Panel(
             y = deltaY + KnitMouse.Raw.y.toFloat()
         }
 
+        sections
+            .filter { !it.isPointInside(mouseX, mouseY) && isHovered }
+            .forEach { it.handleMouseMove(mouseX, mouseY) }
+        
         if (!isAnimating) adjustScrollAfterResize()
     }
 }

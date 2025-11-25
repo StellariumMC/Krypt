@@ -11,6 +11,7 @@ import xyz.meowing.krypt.managers.config.CategoryElement
 import xyz.meowing.krypt.utils.Utils.toColorFromMap
 import xyz.meowing.krypt.config.ui.panels.Panel
 import xyz.meowing.krypt.config.ui.elements.MCColorCode
+import xyz.meowing.krypt.config.ui.elements.FeatureTooltip
 import java.awt.Color
 
 typealias ConfigData = Map<String, Any>
@@ -24,6 +25,7 @@ object ClickGUI : VexelScreen("Zen Config") {
     )
 
     private lateinit var searchBar: SearchBar
+    lateinit var featureTooltip: FeatureTooltip
 
     private val configListeners = mutableMapOf<String, MutableList<(Any) -> Unit>>()
     private val closeListeners = mutableListOf<() -> Unit>()
@@ -64,6 +66,13 @@ object ClickGUI : VexelScreen("Zen Config") {
         }
 
         searchBar.childOf(window)
+
+        featureTooltip = FeatureTooltip()
+        featureTooltip.childOf(window)
+    }
+
+    fun updateTooltip(description: String) {
+        if (::featureTooltip.isInitialized) featureTooltip.setText(description)
     }
 
     private fun getDefaultValue(type: ElementType?): Any? = when (type) {
@@ -139,7 +148,6 @@ object ClickGUI : VexelScreen("Zen Config") {
 
     override fun onMouseScroll(horizontal: Double, vertical: Double) {
         if (KnitKeyboard.isShiftKeyPressed) {
-            //TODO: clean up later, a bit schizo.
             val scrollAmount = vertical.toFloat() * 20f
 
             val leftmostX = panels.minOfOrNull { it.x } ?: 0f

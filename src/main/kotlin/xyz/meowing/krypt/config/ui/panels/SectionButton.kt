@@ -13,6 +13,7 @@ import xyz.meowing.krypt.managers.config.FeatureElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.ui.Theme
 import xyz.meowing.krypt.config.ui.elements.base.ElementRenderer
+import xyz.meowing.krypt.config.ui.ClickGUI
 import java.awt.Color
 import kotlin.math.absoluteValue
 
@@ -74,10 +75,15 @@ class SectionButton(
                     Color(Theme.Bg.color).brighter().rgb
                 }
                 buttonBackground.colorTo(hoverColor, 150, EasingType.EASE_OUT)
+                ClickGUI.updateTooltip(feature.description)
             },
             { _, _ ->
                 val baseColor = if (isEnabled) Theme.Primary.color else Theme.Bg.color
                 buttonBackground.colorTo(baseColor, 150, EasingType.EASE_IN)
+
+                if (feature.description == ClickGUI.featureTooltip.currentText) { // two can be hovered at the same time, and i like it that way (please fix if you read this)
+                    ClickGUI.updateTooltip("")
+                }
             }
         )
 
