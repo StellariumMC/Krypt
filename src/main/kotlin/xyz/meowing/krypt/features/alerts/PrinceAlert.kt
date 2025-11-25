@@ -18,7 +18,7 @@ object PrinceAlert : Feature(
     override fun addConfig() {
         ConfigManager
             .addFeature(
-                "Prince title",
+                "Prince alert",
                 "Display prince death title",
                 "Alerts",
                 ConfigElement(
