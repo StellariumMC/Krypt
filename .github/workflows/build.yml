@@ -19,6 +19,31 @@ jobs:
         with:
           java-version: '21'
           distribution: 'microsoft'
+      - name: cache gradle wrapper
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-wrapper-
+      - name: cache gradle caches
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('**/gradle.properties', '**/build.gradle.kts', '**/settings.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-caches-
+      - name: cache loom
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/loom-cache
+            .gradle/loom-cache
+          key: ${{ runner.os }}-loom-${{ hashFiles('**/gradle.properties', '**/build.gradle.kts', '**/settings.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-loom-
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
       - name: build
@@ -28,3 +53,57 @@ jobs:
         with:
           name: Artifacts
           path: build/versions/
+
+  cleanup-caches:
+    runs-on: ubuntu-24.04
+    needs: build
+    if: always()
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+      - name: cleanup old caches
+        run: |
+          gh extension install actions/gh-actions-cache
+          
+          ## Setting this to not fail the workflow while deleting cache keys. 
+          set +e
+          
+          # Cleanup old loom caches
+          echo "Fetching list of loom cache keys"
+          cacheKeysForPR=$(gh actions-cache list -R $REPO -B $BRANCH --key "${{ runner.os }}-loom-" | cut -f 1)
+          echo "Deleting old loom caches..."
+          for cacheKey in $cacheKeysForPR
+          do
+              if [ "$cacheKey" != "${{ runner.os }}-loom-${{ hashFiles('**/gradle.properties', '**/build.gradle.kts', '**/settings.gradle.kts') }}" ]; then
+                  gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
+              fi
+          done
+          
+          # Cleanup old gradle caches
+          echo "Fetching list of gradle cache keys"
+          cacheKeysForPR=$(gh actions-cache list -R $REPO -B $BRANCH --key "${{ runner.os }}-gradle-caches-" | cut -f 1)
+          echo "Deleting old gradle caches..."
+          for cacheKey in $cacheKeysForPR
+          do
+              if [ "$cacheKey" != "${{ runner.os }}-gradle-caches-${{ hashFiles('**/gradle.properties', '**/build.gradle.kts', '**/settings.gradle.kts') }}" ]; then
+                  gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
+              fi
+          done
+          
+          # Cleanup old wrapper caches (keep all wrapper caches as they're stable)
+          echo "Fetching list of wrapper cache keys"
+          cacheKeysForPR=$(gh actions-cache list -R $REPO -B $BRANCH --key "${{ runner.os }}-gradle-wrapper-" | cut -f 1)
+          echo "Deleting old wrapper caches..."
+          for cacheKey in $cacheKeysForPR
+          do
+              if [ "$cacheKey" != "${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradle-wrapper.properties') }}" ]; then
+                  gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
+              fi
+          done
+          
+          echo "Done"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref }}
+        continue-on-error: true
