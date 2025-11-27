@@ -68,36 +68,40 @@ jobs:
           ## Setting this to not fail the workflow while deleting cache keys. 
           set +e
           
-          # Cleanup old loom caches
-          echo "Fetching list of loom cache keys"
-          cacheKeysForPR=$(gh actions-cache list -R $REPO -B $BRANCH --key "${{ runner.os }}-loom-" | cut -f 1)
+          CURRENT_LOOM_KEY="${{ runner.os }}-loom-${{ hashFiles('**/gradle.properties', '**/build.gradle.kts', '**/settings.gradle.kts') }}"
+          CURRENT_GRADLE_KEY="${{ runner.os }}-gradle-caches-${{ hashFiles('**/gradle.properties', '**/build.gradle.kts', '**/settings.gradle.kts') }}"
+          CURRENT_WRAPPER_KEY="${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradle-wrapper.properties') }}"
+          
+          # Cleanup old loom caches (across all branches)
+          echo "Fetching list of loom cache keys across all branches"
+          cacheKeys=$(gh actions-cache list -R $REPO --key "${{ runner.os }}-loom-" | cut -f 1)
           echo "Deleting old loom caches..."
-          for cacheKey in $cacheKeysForPR
+          for cacheKey in $cacheKeys
           do
-              if [ "$cacheKey" != "${{ runner.os }}-loom-${{ hashFiles('**/gradle.properties', '**/build.gradle.kts', '**/settings.gradle.kts') }}" ]; then
-                  gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
+              if [ "$cacheKey" != "$CURRENT_LOOM_KEY" ]; then
+                  gh actions-cache delete $cacheKey -R $REPO --confirm
               fi
           done
           
-          # Cleanup old gradle caches
-          echo "Fetching list of gradle cache keys"
-          cacheKeysForPR=$(gh actions-cache list -R $REPO -B $BRANCH --key "${{ runner.os }}-gradle-caches-" | cut -f 1)
+          # Cleanup old gradle caches (across all branches)
+          echo "Fetching list of gradle cache keys across all branches"
+          cacheKeys=$(gh actions-cache list -R $REPO --key "${{ runner.os }}-gradle-caches-" | cut -f 1)
           echo "Deleting old gradle caches..."
-          for cacheKey in $cacheKeysForPR
+          for cacheKey in $cacheKeys
           do
-              if [ "$cacheKey" != "${{ runner.os }}-gradle-caches-${{ hashFiles('**/gradle.properties', '**/build.gradle.kts', '**/settings.gradle.kts') }}" ]; then
-                  gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
+              if [ "$cacheKey" != "$CURRENT_GRADLE_KEY" ]; then
+                  gh actions-cache delete $cacheKey -R $REPO --confirm
               fi
           done
           
-          # Cleanup old wrapper caches (keep all wrapper caches as they're stable)
-          echo "Fetching list of wrapper cache keys"
-          cacheKeysForPR=$(gh actions-cache list -R $REPO -B $BRANCH --key "${{ runner.os }}-gradle-wrapper-" | cut -f 1)
+          # Cleanup old wrapper caches (across all branches)
+          echo "Fetching list of wrapper cache keys across all branches"
+          cacheKeys=$(gh actions-cache list -R $REPO --key "${{ runner.os }}-gradle-wrapper-" | cut -f 1)
           echo "Deleting old wrapper caches..."
-          for cacheKey in $cacheKeysForPR
+          for cacheKey in $cacheKeys
           do
-              if [ "$cacheKey" != "${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradle-wrapper.properties') }}" ]; then
-                  gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
+              if [ "$cacheKey" != "$CURRENT_WRAPPER_KEY" ]; then
+                  gh actions-cache delete $cacheKey -R $REPO --confirm
               fi
           done
           
@@ -105,5 +109,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
-          BRANCH: ${{ github.ref }}
         continue-on-error: true
