@@ -215,21 +215,24 @@ object TerminalWaypoints : Feature(
                         boxPos.center.toAabb(),
                         color,
                         consumers,
-                        matrices
+                        matrices,
+                        true
                     )
 
                     1 -> Render3D.drawFilledBB(
                         boxPos.center.toAabb(),
                         color,
                         consumers,
-                        matrices
+                        matrices,
+                        true
                     )
 
                     2 -> Render3D.drawSpecialBB(
                         boxPos.center.toAabb(),
                         color,
                         consumers,
-                        matrices
+                        matrices,
+                        true
                     )
                 }
 
@@ -238,7 +241,8 @@ object TerminalWaypoints : Feature(
                     Render3D.drawString(
                         terminal.defaultClass.getFancyName(),
                         textPos.center,
-                        matrices
+                        matrices,
+                        depth = false
                     )
                 }
             }
