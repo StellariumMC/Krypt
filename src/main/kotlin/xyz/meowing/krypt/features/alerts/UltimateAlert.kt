@@ -143,59 +143,63 @@ object UltimateAlert : Feature(
             when {
                 message == "⚠ Maxor is enraged! ⚠" -> {
                     if (wishNotify && (!checkClass || playerClass == DungeonClass.HEALER)) {
-                        showTitle(wishNotifyText, duration = 2000)
-                        KnitChat.modMessage("§f$wishNotifyText")
+                        showTitle("§b${wishNotifyText.getText()}", duration = 2000)
+                        KnitChat.modMessage("§b${wishNotifyText.getText()}")
                     }
                     if (ultimateNotify && (!checkClass || playerClass == DungeonClass.TANK)) {
-                        showTitle(ultimateNotifyText, duration = 2000)
-                        KnitChat.modMessage("§f$ultimateNotifyText")
+                        showTitle("§b${ultimateNotifyText.getText()}", duration = 2000)
+                        KnitChat.modMessage("§b${ultimateNotifyText.getText()}")
                     }
                 }
 
                 message == "[BOSS] Sadan: My giants! Unleashed!" -> {
                     Thread.sleep(3000)
                     if (wishNotify && (!checkClass || playerClass == DungeonClass.HEALER)) {
-                        showTitle(wishNotifyText, duration = 2000)
-                        KnitChat.modMessage("§f$wishNotifyText")
+                        showTitle("§b${wishNotifyText.getText()}", duration = 2000)
+                        KnitChat.modMessage("§b${wishNotifyText.getText()}")
                     }
                     if (ultimateNotify && (!checkClass || playerClass in listOf(DungeonClass.TANK, DungeonClass.ARCHER))) {
-                        showTitle(ultimateNotifyText, duration = 2000)
-                        KnitChat.modMessage("§f$ultimateNotifyText")
+                        showTitle("§b${ultimateNotifyText.getText()}", duration = 2000)
+                        KnitChat.modMessage("§b${ultimateNotifyText.getText()}")
                     }
                 }
 
                 message == "⚠ Storm is enraged! ⚠" -> {
                     if (stormEnrage && (!stormEnrageTankOnly || playerClass == DungeonClass.TANK)) {
-                        showTitle(stormEnrageText, duration = 2000)
-                        KnitChat.modMessage("§f$stormEnrageText")
+                        showTitle("§b${stormEnrageText.getText()}", duration = 2000)
+                        KnitChat.modMessage("§b${stormEnrageText.getText()}")
                     }
                 }
 
                 message == "[BOSS] Goldor: You have done it, you destroyed the factory…" -> {
                     if (wishNotify && (!checkClass || playerClass == DungeonClass.HEALER)) {
-                        showTitle(wishNotifyText, duration = 2000)
-                        KnitChat.modMessage("§f$wishNotifyText")
+                        showTitle("§b${wishNotifyText.getText()}", duration = 2000)
+                        KnitChat.modMessage("§b${wishNotifyText.getText()}")
                     }
                     if (ultimateNotify && (!checkClass || playerClass in listOf(DungeonClass.TANK, DungeonClass.ARCHER))) {
-                        showTitle(ultimateNotifyText, duration = 2000)
-                        KnitChat.modMessage("§f$ultimateNotifyText")
+                        showTitle("§b${ultimateNotifyText.getText()}", duration = 2000)
+                        KnitChat.modMessage("§b${ultimateNotifyText.getText()}")
                     }
                 }
 
                 message.startsWith("Your Wish healed your entire team for") && message.contains("health and shielded them for") -> {
                     if (wishedNotify) {
-                        showTitle(wishedNotifyText, duration = 2000)
-                        KnitChat.modMessage("§f$wishedNotifyText")
+                        showTitle("§b${wishedNotifyText.getText()}", duration = 2000)
+                        KnitChat.modMessage("§b${wishedNotifyText.getText()}")
                     }
                 }
 
                 message == "Used Castle of Stone!" -> {
                     if (castleNotify) {
-                        showTitle(castleNotifyText, duration = 2000)
-                        KnitChat.modMessage("§f$castleNotifyText")
+                        showTitle("§b${castleNotifyText.getText()}", duration = 2000)
+                        KnitChat.modMessage("§b${castleNotifyText.getText()}")
                     }
                 }
             }
         }
+    }
+
+    fun String.getText(): String {
+        return this.replace("&", "§")
     }
 }
