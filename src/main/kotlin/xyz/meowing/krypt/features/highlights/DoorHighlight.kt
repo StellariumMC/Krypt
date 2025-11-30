@@ -1,8 +1,12 @@
 package xyz.meowing.krypt.features.highlights
 
+import net.minecraft.core.BlockPos
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.AABB
 import tech.thatgravyboat.skyblockapi.utils.regex.matchWhen
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.enums.DungeonKey
@@ -139,6 +143,11 @@ object DoorHighlight : Feature(
                 }
 
                 val (x, y, z) = door.getPos()
+
+                val block = KnitClient.world?.getBlockState(BlockPos(x, y + 1, z))
+
+                if ((block?.block == Blocks.BARRIER || block?.isAir == true) && !door.isFairyDoor) return@forEach
+
                 val box = AABB(
                     x.toDouble() - 1.0, y.toDouble(), z.toDouble() - 1,
                     x.toDouble() + 2.0, y.toDouble() + 4.0, z.toDouble() + 2
