@@ -21,6 +21,7 @@
         "MixinClientPlayNetworkHandler",
         "MixinEntityRenderer",
         "MixinGameRenderer",
-        "MixinMinecraft"
+        "MixinMinecraft",
+        "MixinMouseHandler"
     ]
 }

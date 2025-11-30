@@ -2,16 +2,19 @@ package xyz.meowing.krypt.config
 
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.api.KnitClipboard
 import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.krypt.Krypt
 import xyz.meowing.krypt.annotations.Command
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
+import xyz.meowing.krypt.features.waypoints.WaypointDecoder
 import xyz.meowing.krypt.hud.HudEditor
 import xyz.meowing.krypt.managers.config.ConfigManager.configUI
 import xyz.meowing.krypt.managers.config.ConfigManager.openConfig
 import xyz.meowing.krypt.utils.modMessage
-import java.lang.Exception
+import java.awt.Toolkit
+import java.awt.datatransfer.DataFlavor
 
 @Command
 object ConfigCommand : Commodore("krypt") {
@@ -40,6 +43,25 @@ object ConfigCommand : Commodore("krypt") {
         literal("currentRoom") {
             runs {
                 Krypt.LOGGER.info(DungeonAPI.currentRoom)
+            }
+        }
+
+        literal("import") {
+            runs {
+                try {
+                    val clipboard = KnitClipboard.string
+
+                    KnitChat.modMessage("§eImporting waypoints from clipboard...")
+
+                    if (WaypointDecoder.importFromBase64(clipboard.trim())) {
+                        KnitChat.modMessage("§aSuccessfully imported waypoints!")
+                    } else {
+                        KnitChat.modMessage("§cFailed to import waypoints. Check logs for details.")
+                    }
+                } catch (e: Exception) {
+                    KnitChat.modMessage("§cError reading clipboard: ${e.message}")
+                    Krypt.LOGGER.error("Clipboard import failed: $e")
+                }
             }
         }
 
