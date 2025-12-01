@@ -20,8 +20,8 @@ import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.hud.HudEditor
-import xyz.meowing.krypt.hud.HudManager
+import xyz.meowing.krypt.hud.HUDEditor
+import xyz.meowing.krypt.hud.HUDManager
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.NetworkUtils
@@ -105,7 +105,7 @@ object QuizSolver : Feature(
                     "quizSolver.hudEditor",
                     ElementType.Button("Edit Timer Position") {
                         TickScheduler.Client.post {
-                            client.execute { client.setScreen(HudEditor()) }
+                            client.execute { client.setScreen(HUDEditor()) }
                         }
                     }
                 )
@@ -113,7 +113,7 @@ object QuizSolver : Feature(
     }
 
     override fun initialize() {
-        HudManager.register(NAME, "§5Quiz §f: §c10.45s", "quizSolver.timer")
+        HUDManager.register(NAME, "§5Quiz §f: §c10.45s", "quizSolver.timer")
 
         register<GuiEvent.Render.HUD> { renderHud(it.context) }
 
@@ -224,9 +224,9 @@ object QuizSolver : Feature(
     }
 
     private fun renderHud(context: GuiGraphics) {
-        val x = HudManager.getX(NAME)
-        val y = HudManager.getY(NAME)
-        val scale = HudManager.getScale(NAME)
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+        val scale = HUDManager.getScale(NAME)
 
         if (timer && questionsStarted) {
             val timer = when {

@@ -21,7 +21,7 @@ import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.PacketEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.hud.HudManager
+import xyz.meowing.krypt.hud.HUDManager
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render2D
@@ -92,7 +92,7 @@ object BreakerChargeDisplay : Feature(
     }
 
     override fun initialize() {
-        HudManager.register(NAME, "§c⸕§e20", "breakerChargeDisplay.renderText")
+        HUDManager.register(NAME, "§c⸕§e20", "breakerChargeDisplay.renderText")
 
         register<PacketEvent.Received> { event ->
             val packet = event.packet as? ClientboundContainerSetSlotPacket ?: return@register
@@ -117,9 +117,9 @@ object BreakerChargeDisplay : Feature(
             if (!renderText) return@register
             if (renderString.isEmpty()) return@register
 
-            val x = HudManager.getX(NAME)
-            val y = HudManager.getY(NAME)
-            val scale = HudManager.getScale(NAME)
+            val x = HUDManager.getX(NAME)
+            val y = HUDManager.getY(NAME)
+            val scale = HUDManager.getScale(NAME)
 
             Render2D.renderString(event.context, renderString, x, y, scale)
         }

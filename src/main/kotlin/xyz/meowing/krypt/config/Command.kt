@@ -12,7 +12,7 @@ import xyz.meowing.krypt.features.waypoints.RoomWaypointHandler
 import xyz.meowing.krypt.features.waypoints.RouteRecorder
 import xyz.meowing.krypt.features.waypoints.WaypointDecoder
 import xyz.meowing.krypt.features.waypoints.WaypointRegistry
-import xyz.meowing.krypt.hud.HudEditor
+import xyz.meowing.krypt.hud.HUDEditor
 import xyz.meowing.krypt.managers.config.ConfigManager.configUI
 import xyz.meowing.krypt.managers.config.ConfigManager.openConfig
 import xyz.meowing.krypt.utils.modMessage
@@ -36,7 +36,7 @@ object ConfigCommand : Commodore("krypt") {
         literal("hud") {
             runs {
                 TickScheduler.Client.post {
-                    client.execute { client.setScreen(HudEditor()) }
+                    client.execute { client.setScreen(HUDEditor()) }
                 }
             }
         }

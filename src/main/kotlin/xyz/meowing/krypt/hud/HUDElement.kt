@@ -2,7 +2,7 @@ package xyz.meowing.krypt.hud
 
 import xyz.meowing.krypt.managers.config.ConfigManager
 
-class HudElement(
+class HUDElement(
     val id: String,
     var x: Float,
     var y: Float,

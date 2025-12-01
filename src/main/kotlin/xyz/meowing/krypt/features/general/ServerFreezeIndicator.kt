@@ -10,8 +10,8 @@ import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.GuiEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.hud.HudEditor
-import xyz.meowing.krypt.hud.HudManager
+import xyz.meowing.krypt.hud.HUDEditor
+import xyz.meowing.krypt.hud.HUDManager
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render2D
@@ -49,7 +49,7 @@ object ServerFreezeIndicator : Feature(
                     "freezeIndicator.hudEditor",
                     ElementType.Button("Edit Position") {
                         TickScheduler.Client.post {
-                            client.execute { client.setScreen(HudEditor()) }
+                            client.execute { client.setScreen(HUDEditor()) }
                         }
                     }
                 )
@@ -57,7 +57,7 @@ object ServerFreezeIndicator : Feature(
     }
 
     override fun initialize() {
-        HudManager.register(NAME, "§c567ms", "freezeIndicator")
+        HUDManager.register(NAME, "§c567ms", "freezeIndicator")
 
         register<GuiEvent.Render.HUD> { renderHud(it.context) }
 
@@ -67,9 +67,9 @@ object ServerFreezeIndicator : Feature(
     }
 
     private fun renderHud(context: GuiGraphics) {
-        val x = HudManager.getX(NAME)
-        val y = HudManager.getY(NAME)
-        val scale = HudManager.getScale(NAME)
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+        val scale = HUDManager.getScale(NAME)
 
         val now = System.currentTimeMillis()
         val timeDelta = now - lastTick

@@ -10,7 +10,7 @@ import xyz.meowing.krypt.events.core.ChatEvent
 import xyz.meowing.krypt.events.core.GuiEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.hud.HudManager
+import xyz.meowing.krypt.hud.HUDManager
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.TitleUtils.showTitle
@@ -47,7 +47,7 @@ object FireFreezeAlert : Feature(
     }
 
     override fun initialize() {
-        HudManager.register(NAME, "§bFire freeze: §c4.3s", "fireFreezeTimer")
+        HUDManager.register(NAME, "§bFire freeze: §c4.3s", "fireFreezeTimer.timer")
 
         register<ChatEvent.Receive> { event ->
             if (event.isActionBar) return@register
@@ -78,9 +78,9 @@ object FireFreezeAlert : Feature(
         if (ticks <= 0) return
 
         val text = "§bFire freeze: §c${"%.1f".format(ticks / 20.0)}s"
-        val x = HudManager.getX(NAME)
-        val y = HudManager.getY(NAME)
-        val scale = HudManager.getScale(NAME)
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+        val scale = HUDManager.getScale(NAME)
 
         Render2D.renderString(context, text, x, y, scale)
     }

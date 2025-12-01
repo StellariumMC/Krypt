@@ -10,7 +10,7 @@ import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.GuiEvent
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.features.map.render.MapRenderer
-import xyz.meowing.krypt.hud.HudManager
+import xyz.meowing.krypt.hud.HUDManager
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import java.awt.Color
@@ -36,7 +36,7 @@ object DungeonMap : Feature(
     }
 
     override fun initialize() {
-        HudManager.registerCustom(
+        HUDManager.registerCustom(
             NAME,
             148,
             158,
@@ -48,9 +48,9 @@ object DungeonMap : Feature(
     }
 
     private fun renderMap(context: GuiGraphics) {
-        val x = HudManager.getX(NAME)
-        val y = HudManager.getY(NAME)
-        val scale = HudManager.getScale(NAME)
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+        val scale = HUDManager.getScale(NAME)
 
         MapRenderer.render(context, x, y, scale)
     }

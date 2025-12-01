@@ -4,34 +4,34 @@ import net.minecraft.client.gui.GuiGraphics
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.input.KnitMouse
 import xyz.meowing.knit.api.screen.KnitScreen
-import xyz.meowing.krypt.hud.HudManager.customRenderers
+import xyz.meowing.krypt.hud.HUDManager.customRenderers
 import xyz.meowing.krypt.utils.rendering.Render2D.height
 import xyz.meowing.krypt.utils.rendering.Render2D.width
 import java.awt.Color
 
-class HudEditor : KnitScreen("HUD Editor") {
+class HUDEditor : KnitScreen("HUD Editor") {
     private val borderHoverColor = Color(255, 255, 255).rgb
     private val borderNormalColor = Color(100, 100, 120).rgb
 
-    private var dragging: HudElement? = null
+    private var dragging: HUDElement? = null
     private var offsetX = 0f
     private var offsetY = 0f
 
     override fun onInitGui() {
         super.onInitGui()
-        HudManager.loadAllLayouts()
+        HUDManager.loadAllLayouts()
     }
 
     override fun onCloseGui() {
         super.onCloseGui()
-        HudManager.saveAllLayouts()
+        HUDManager.saveAllLayouts()
     }
 
     override fun onRender(context: GuiGraphics?, mouseX: Int, mouseY: Int, deltaTicks: Float) {
         val context = context ?: return
         context.fill(0, 0, width, width, 0x90000000.toInt())
 
-        HudManager.elements.values.forEach { element ->
+        HUDManager.elements.values.forEach { element ->
             if (!element.isEnabled()) return@forEach
 
             //#if MC >= 1.21.7
@@ -82,7 +82,7 @@ class HudEditor : KnitScreen("HUD Editor") {
     }
 
     override fun onMouseClick(mouseX: Int, mouseY: Int, button: Int) {
-        val hovered = HudManager.elements.values.firstOrNull { it.isHovered(mouseX.toFloat(), mouseY.toFloat()) }
+        val hovered = HUDManager.elements.values.firstOrNull { it.isHovered(mouseX.toFloat(), mouseY.toFloat()) }
         if (hovered != null) {
             dragging = hovered
             offsetX = mouseX.toFloat() - hovered.x
@@ -102,7 +102,7 @@ class HudEditor : KnitScreen("HUD Editor") {
     }
 
     override fun onMouseScroll(horizontal: Double, vertical: Double) {
-        val hovered = HudManager.elements.values.firstOrNull { it.isHovered(KnitMouse.Scaled.x.toFloat(), KnitMouse.Scaled.y.toFloat()) }
+        val hovered = HUDManager.elements.values.firstOrNull { it.isHovered(KnitMouse.Scaled.x.toFloat(), KnitMouse.Scaled.y.toFloat()) }
 
         if (hovered != null) {
             val scaleDelta = if (vertical > 0) 0.1f else -0.1f

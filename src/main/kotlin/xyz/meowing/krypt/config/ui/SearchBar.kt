@@ -10,7 +10,7 @@ import xyz.meowing.vexel.components.base.Size
 import xyz.meowing.vexel.components.base.VexelElement
 import xyz.meowing.vexel.components.core.Rectangle
 import xyz.meowing.vexel.components.core.SvgImage
-import xyz.meowing.krypt.hud.HudEditor
+import xyz.meowing.krypt.hud.HUDEditor
 import xyz.meowing.krypt.ui.Theme
 import java.awt.Color
 
@@ -59,7 +59,7 @@ class SearchBar(
 
         editGuiLocationsButton.onClick { _, _, _ ->
             TickScheduler.Client.post {
-                client.setScreen(HudEditor())
+                client.setScreen(HUDEditor())
             }
             true
         }

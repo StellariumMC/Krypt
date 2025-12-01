@@ -9,8 +9,8 @@ import xyz.meowing.krypt.api.location.SkyBlockIsland
 import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.GuiEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.hud.HudEditor
-import xyz.meowing.krypt.hud.HudManager
+import xyz.meowing.krypt.hud.HUDEditor
+import xyz.meowing.krypt.hud.HUDManager
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render2D
@@ -39,7 +39,7 @@ object RoomSecrets: Feature(
                 "roomSecrets.hudEditor",
                 ElementType.Button("Edit Position") {
                     TickScheduler.Client.post {
-                        client.execute { client.setScreen(HudEditor()) }
+                        client.execute { client.setScreen(HUDEditor()) }
                     }
                 }
             )
@@ -47,7 +47,7 @@ object RoomSecrets: Feature(
     }
 
     override fun initialize() {
-        HudManager.registerCustom(NAME, 50,30, this::hudEditorRender, "roomSecrets")
+        HUDManager.registerCustom(NAME, 50,30, this::hudEditorRender, "roomSecrets")
 
         register<GuiEvent.Render.HUD> {
             if (DungeonAPI.inBoss) return@register
@@ -86,9 +86,9 @@ object RoomSecrets: Feature(
 
     private fun renderHUD(context: GuiGraphics) {
         val matrix = context.pose()
-        val x = HudManager.getX(NAME)
-        val y = HudManager.getY(NAME)
-        val scale = HudManager.getScale(NAME)
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+        val scale = HUDManager.getScale(NAME)
 
         //#if MC >= 1.21.7
         //$$ matrix.pushMatrix()

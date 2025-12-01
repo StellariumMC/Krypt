@@ -19,7 +19,7 @@ import xyz.meowing.krypt.events.core.GuiEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.hud.HudManager
+import xyz.meowing.krypt.hud.HUDManager
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render2D
@@ -97,7 +97,7 @@ object MaskTimer : Feature(
     )
 
     override fun initialize() {
-        HudManager.registerCustom(NAME, 60, 57, this::editorRender, "maskTimers")
+        HUDManager.registerCustom(NAME, 60, 57, this::editorRender, "maskTimers")
 
         register<ChatEvent.Receive> { event ->
             if (event.isActionBar) return@register
@@ -177,9 +177,9 @@ object MaskTimer : Feature(
         val activeMasks = getActiveMasks()
         if (activeMasks.isEmpty()) return
 
-        val x = HudManager.getX(NAME)
-        val y = HudManager.getY(NAME)
-        val scale = HudManager.getScale(NAME)
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+        val scale = HUDManager.getScale(NAME)
         drawHUD(context, x, y, scale, activeMasks)
     }
 

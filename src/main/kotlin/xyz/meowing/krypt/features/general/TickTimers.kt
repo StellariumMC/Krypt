@@ -15,8 +15,8 @@ import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.ScoreboardEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.hud.HudEditor
-import xyz.meowing.krypt.hud.HudManager
+import xyz.meowing.krypt.hud.HUDEditor
+import xyz.meowing.krypt.hud.HUDManager
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.Utils.toTimerFormat
@@ -86,7 +86,7 @@ object TickTimers : Feature(
                     "tickTimers.hudEditor",
                     ElementType.Button("Edit Position") {
                         TickScheduler.Client.post {
-                            client.execute { client.setScreen(HudEditor()) }
+                            client.execute { client.setScreen(HUDEditor()) }
                         }
                     }
                 )
@@ -94,7 +94,7 @@ object TickTimers : Feature(
     }
 
     override fun initialize() {
-        HudManager.register(NAME, "§a17", "tickTimers")
+        HUDManager.register(NAME, "§a17", "tickTimers")
 
         register<GuiEvent.Render.HUD> { renderHud(it.context) }
 
@@ -149,9 +149,9 @@ object TickTimers : Feature(
     }
 
     private fun renderHud(context: GuiGraphics) {
-        val x = HudManager.getX(NAME)
-        val y = HudManager.getY(NAME)
-        val scale = HudManager.getScale(NAME)
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+        val scale = HUDManager.getScale(NAME)
 
         if (secretTicksToggled && !DungeonAPI.inBoss) {
             val color = if (secretTicks <= 5) "§c" else if (secretTicks <= 10) "§6" else "§a"

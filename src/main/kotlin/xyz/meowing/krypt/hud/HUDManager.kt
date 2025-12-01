@@ -8,8 +8,8 @@ import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
 
-object HudManager {
-    val elements = mutableMapOf<String, HudElement>()
+object HUDManager {
+    val elements = mutableMapOf<String, HUDElement>()
     val customRenderers = mutableMapOf<String, (GuiGraphics) -> Unit>()
     val customSizes = mutableMapOf<String, Pair<Int, Int>>()
 
@@ -43,7 +43,7 @@ object HudManager {
 
 
     fun register(id: String, text: String, configKey: String? = null) {
-        elements[id] = HudElement(id, 20f, 20f, 0, 0, text = text, configKey = configKey)
+        elements[id] = HUDElement(id, 20f, 20f, 0, 0, text = text, configKey = configKey)
         loadLayout(id)
     }
 
@@ -56,7 +56,7 @@ object HudManager {
     ) {
         customRenderers[id] = renderer
         customSizes[id] = width to height
-        elements[id] = HudElement(id, 20f, 20f, width, height, configKey = configKey)
+        elements[id] = HUDElement(id, 20f, 20f, width, height, configKey = configKey)
         loadLayout(id)
     }
 

@@ -15,7 +15,7 @@ import xyz.meowing.krypt.events.core.PacketEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.hud.HudManager
+import xyz.meowing.krypt.hud.HUDManager
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.Utils.equalsOneOf
@@ -90,7 +90,7 @@ object SpringBootsOverlay : Feature(
     }
 
     override fun initialize() {
-        HudManager.register(NAME, "§eHeight: §c44", "springBootsOverlay")
+        HUDManager.register(NAME, "§eHeight: §c44", "springBootsOverlay")
 
         register<PacketEvent.Received> { event ->
             val packet = event.packet as? ClientboundSoundPacket ?: return@register
@@ -146,9 +146,9 @@ object SpringBootsOverlay : Feature(
         register<GuiEvent.Render.HUD> { event ->
             if (height == 0f) return@register
 
-            val x = HudManager.getX(NAME)
-            val y = HudManager.getY(NAME)
-            val scale = HudManager.getScale(NAME)
+            val x = HUDManager.getX(NAME)
+            val y = HUDManager.getY(NAME)
+            val scale = HUDManager.getScale(NAME)
             val decimal = height.color()
 
             val height = if (decimal.endsWith(".0")) decimal.dropLast(2) else decimal
