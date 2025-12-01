@@ -87,7 +87,7 @@ object DungeonWaypoints : Feature(
             .addFeatureOption(
                 "Text render distance",
                 ConfigElement(
-                    "dungeonWaypoints.textRender",
+                    "dungeonWaypoints.textRenderDistance",
                     ElementType.Slider(1.0, 20.0, 10.0, false)
                 )
             )

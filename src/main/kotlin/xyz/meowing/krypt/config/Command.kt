@@ -16,8 +16,6 @@ import xyz.meowing.krypt.hud.HudEditor
 import xyz.meowing.krypt.managers.config.ConfigManager.configUI
 import xyz.meowing.krypt.managers.config.ConfigManager.openConfig
 import xyz.meowing.krypt.utils.modMessage
-import java.awt.Toolkit
-import java.awt.datatransfer.DataFlavor
 
 @Command
 object ConfigCommand : Commodore("krypt") {
