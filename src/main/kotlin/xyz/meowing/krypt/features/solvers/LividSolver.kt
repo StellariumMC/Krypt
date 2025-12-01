@@ -16,15 +16,21 @@ import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.enums.DungeonFloor
+import xyz.meowing.krypt.events.core.ChatEvent
 import xyz.meowing.krypt.events.core.EntityEvent
+import xyz.meowing.krypt.events.core.GuiEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.RenderEvent
+import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.events.core.WorldEvent
+import xyz.meowing.krypt.hud.HUDManager
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
+import xyz.meowing.krypt.utils.TitleUtils
 import xyz.meowing.krypt.utils.Utils.toFloatArray
 import xyz.meowing.krypt.utils.glowThisFrame
 import xyz.meowing.krypt.utils.glowingColor
+import xyz.meowing.krypt.utils.rendering.Render2D
 import java.awt.Color
 
 @Module
@@ -34,6 +40,11 @@ object LividSolver : Feature(
 ) {
     private var currentLivid = Livid.HOCKEY
     private val lividPos = BlockPos(5, 108, 42)
+    private var started = false
+    private var ticks = 390
+
+    private const val NAME = "Ice Spray Timer"
+    private const val START_MESSAGE = "[BOSS] Livid: Welcome, you've arrived right on time. I am Livid, the Master of Shadows."
 
     private enum class Livid(
         val entityName: String,
@@ -55,6 +66,8 @@ object LividSolver : Feature(
 
     private val lividSolverColor by ConfigDelegate<Color>("lividSolver.color")
     private val lividSolverLine by ConfigDelegate<Boolean>("lividSolver.line")
+    private val iceSprayTimer by ConfigDelegate<Boolean>("lividSolver.iceSprayTimer")
+    private val ticksInsteadOfTime by ConfigDelegate<Boolean>("lividSolver.ticksInsteadOfTime")
 
     override fun addConfig() {
         ConfigManager
@@ -81,9 +94,25 @@ object LividSolver : Feature(
                     ElementType.Switch(false)
                 )
             )
+            .addFeatureOption(
+                "Ice spray timer",
+                ConfigElement(
+                    "lividSolver.iceSprayTimer",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Ticks instead of time",
+                ConfigElement(
+                    "lividSolver.ticksInsteadOfTime",
+                    ElementType.Switch(true)
+                )
+            )
     }
 
     override fun initialize() {
+        HUDManager.register(NAME, "§bIce spray in: §f13.4s", "lividSolver.iceSprayTimer")
+
         createCustomEvent<RenderEvent.Entity.Pre>("renderLivid") { event ->
             val entity = event.entity
 
@@ -125,8 +154,39 @@ object LividSolver : Feature(
             }
         }
 
+        register<ChatEvent.Receive> { event ->
+            if (event.isActionBar) return@register
+            if (!iceSprayTimer) return@register
+            if (event.message.stripped != START_MESSAGE) return@register
+
+            started = true
+        }
+
         register<LocationEvent.WorldChange> {
             unregisterRender()
+        }
+
+        register<TickEvent.Server> {
+            if (!started) return@register
+
+            ticks--
+
+            if (ticks == 0) {
+                started = false
+                ticks = 390
+                TitleUtils.showTitle("§bIce spray livid!", duration = 1000)
+            }
+        }
+
+        register<GuiEvent.Render.HUD> { event ->
+            if (!started) return@register
+
+            val x = HUDManager.getX(NAME)
+            val y = HUDManager.getY(NAME)
+            val scale = HUDManager.getScale(NAME)
+            val time = if (ticksInsteadOfTime) "$ticks" else "${ticks / 20}s"
+
+            Render2D.renderString(event.context, "§bIce spray in: §f$time", x, y, scale)
         }
     }
 
@@ -141,5 +201,7 @@ object LividSolver : Feature(
 
         currentLivid = Livid.HOCKEY
         currentLivid.entity = null
+        started = false
+        ticks = 390
     }
 }
