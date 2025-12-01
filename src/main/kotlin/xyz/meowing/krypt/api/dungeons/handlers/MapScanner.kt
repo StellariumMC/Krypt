@@ -3,6 +3,7 @@ package xyz.meowing.krypt.api.dungeons.handlers
 import net.minecraft.world.level.saveddata.maps.MapDecoration
 import net.minecraft.world.level.saveddata.maps.MapDecorationTypes
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData
+import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.krypt.Krypt
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.DungeonAPI.rooms
@@ -30,14 +31,24 @@ object MapScanner {
 
     fun updatePlayers(state: MapItemSavedData) {
         val decorations = (state as AccessorMapState).decorations
-        var playerIndex = 1
+        val players = DungeonAPI.players.filterNotNull()
 
+        val selfDecoration = decorations.values.firstOrNull {
+            it.type == MapDecorationTypes.FRAME
+        }
+
+        if (selfDecoration != null) {
+            val selfPlayer = players.firstOrNull { it.name == KnitPlayer.name }
+            selfPlayer?.let { updatePlayer(it, selfDecoration) }
+        }
+
+        var playerIndex = 0
         for ((_, dec) in decorations) {
             if (dec.type == MapDecorationTypes.FRAME) continue
 
-            while (playerIndex < DungeonAPI.players.size) {
-                val player = DungeonAPI.players[playerIndex++]
-                if (player != null && !player.dead) {
+            while (playerIndex < players.size) {
+                val player = players[playerIndex++]
+                if (player.name != KnitPlayer.name && !player.dead) {
                     updatePlayer(player, dec)
                     break
                 }

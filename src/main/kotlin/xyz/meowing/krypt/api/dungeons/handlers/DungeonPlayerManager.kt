@@ -1,5 +1,6 @@
 package xyz.meowing.krypt.api.dungeons.handlers
 
+import tech.thatgravyboat.skyblockapi.utils.extentions.parseRomanOrArabic
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.krypt.annotations.Module
@@ -24,26 +25,39 @@ object DungeonPlayerManager {
     val players = Array<DungeonPlayer?>(5) { null }
 
     init {
-        EventBus.registerIn<TablistEvent.Change>(SkyBlockIsland.THE_CATACOMBS){ event ->
+        EventBus.registerIn<TablistEvent.Change>(SkyBlockIsland.THE_CATACOMBS) { event ->
             val firstColumn = event.new.firstOrNull() ?: return@registerIn
 
-            for (i in 0 until 5) {
-                val index = 1 + i * 4
-                if (index !in firstColumn.indices) continue
-                val match = playerTabPattern.find(firstColumn[index].stripped)
-                if (match == null) {
-                    players[i] = null
-                    continue
-                }
+            var playerIndex = 0
+
+            for (line in firstColumn) {
+                if (playerIndex >= 5) break
+
+                val stripped = line.stripped
+                val match = playerTabPattern.find(stripped) ?: continue
 
                 val name = match.groups["name"]?.value ?: continue
-                val clazz = DungeonClass.from(match.groups["class"]?.value ?: "EMPTY")
+                val classStr = match.groups["class"]?.value ?: "EMPTY"
+                val levelStr = match.groups["level"]?.value
 
-                if (players[i] != null && players[i]!!.name == name) {
-                    players[i]!!.dungeonClass = clazz
+                val clazz = DungeonClass.from(classStr)
+                val level = levelStr?.parseRomanOrArabic()
+
+                if (players[playerIndex] != null && players[playerIndex]!!.name == name) {
+                    players[playerIndex]!!.dungeonClass = clazz
+                    players[playerIndex]!!.classLevel = level
+                    players[playerIndex]!!.dead = classStr == "DEAD"
                 } else {
-                    players[i] = DungeonPlayer(name, clazz)
+                    players[playerIndex] = DungeonPlayer(name, clazz, level)
+                    players[playerIndex]!!.dead = classStr == "DEAD"
                 }
+
+                playerIndex++
+            }
+
+            while (playerIndex < 5) {
+                players[playerIndex] = null
+                playerIndex++
             }
         }
 

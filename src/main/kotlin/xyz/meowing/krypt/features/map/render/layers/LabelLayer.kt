@@ -5,6 +5,7 @@ import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.enums.map.Checkmark
 import xyz.meowing.krypt.api.dungeons.enums.map.Room
+import xyz.meowing.krypt.api.dungeons.enums.map.RoomShape
 import xyz.meowing.krypt.api.dungeons.enums.map.RoomType
 import xyz.meowing.krypt.features.map.render.MapRenderConfig
 import xyz.meowing.krypt.utils.rendering.Render2D
@@ -59,7 +60,7 @@ object LabelLayer {
 
         val (centerX, centerZ) = RoomLayer.getRoomCenter(room)
         val baseScale = (0.75f * MapRenderConfig.roomLabelScale).toFloat()
-        val scale = if (MapRenderConfig.scaleTextToFitRoom) calculateFittedScale(lines, baseScale) else baseScale
+        val scale = if (MapRenderConfig.scaleTextToFitRoom) calculateFittedScale(lines, baseScale, room) else baseScale
 
         context.pushPop {
             val matrix = context.pose()
@@ -84,11 +85,35 @@ object LabelLayer {
         }
     }
 
-    private fun calculateFittedScale(lines: List<String>, baseScale: Float): Float {
-        val maxWidth = RoomLayer.ROOM_RENDER_SIZE - 4
-        val maxTextWidth = lines.maxOfOrNull { it.stripColor().width() * baseScale } ?: return baseScale
+    private fun calculateFittedScale(lines: List<String>, baseScale: Float, room: Room): Float {
+        val visualWidth = lines.maxOfOrNull { it.stripColor().width() * baseScale } ?: return baseScale
 
-        return if (maxTextWidth > maxWidth) baseScale * (maxWidth / maxTextWidth) else baseScale
+        val roomWidth = when (room.shape) {
+            RoomShape.SHAPE_1X1 -> RoomLayer.ROOM_RENDER_SIZE
+            RoomShape.SHAPE_1X2 -> {
+                val hasHorizontalLayout = room.components.map { it.first }.toSet().size > 1
+                if (hasHorizontalLayout) RoomLayer.ROOM_RENDER_SIZE * 2 + RoomLayer.ROOM_SPACING - RoomLayer.ROOM_RENDER_SIZE
+                else RoomLayer.ROOM_RENDER_SIZE
+            }
+            RoomShape.SHAPE_1X3 -> {
+                val hasHorizontalLayout = room.components.map { it.first }.toSet().size > 1
+                if (hasHorizontalLayout) RoomLayer.ROOM_RENDER_SIZE * 3 + (RoomLayer.ROOM_SPACING - RoomLayer.ROOM_RENDER_SIZE) * 2
+                else RoomLayer.ROOM_RENDER_SIZE
+            }
+            RoomShape.SHAPE_1X4 -> {
+                val hasHorizontalLayout = room.components.map { it.first }.toSet().size > 1
+                if (hasHorizontalLayout) RoomLayer.ROOM_RENDER_SIZE * 4 + (RoomLayer.ROOM_SPACING - RoomLayer.ROOM_RENDER_SIZE) * 3
+                else RoomLayer.ROOM_RENDER_SIZE
+            }
+            RoomShape.SHAPE_2X2 -> RoomLayer.ROOM_RENDER_SIZE * 2 + RoomLayer.ROOM_SPACING - RoomLayer.ROOM_RENDER_SIZE
+            RoomShape.SHAPE_L -> RoomLayer.ROOM_RENDER_SIZE * 2 + RoomLayer.ROOM_SPACING - RoomLayer.ROOM_RENDER_SIZE
+            else -> RoomLayer.ROOM_RENDER_SIZE
+        }
+
+        val maxWidth = (roomWidth - 4).toFloat()
+        val scaleX = if (visualWidth > maxWidth) maxWidth / visualWidth else 1f
+
+        return baseScale * scaleX
     }
 
     private fun renderTextShadow(context: GuiGraphics, text: String, x: Int, y: Int, scale: Float) {
