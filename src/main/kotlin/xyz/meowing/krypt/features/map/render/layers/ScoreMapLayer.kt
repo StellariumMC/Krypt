@@ -4,11 +4,7 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.state.MapRenderState
 import net.minecraft.core.component.DataComponents
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.MapItem
-import net.minecraft.world.level.saveddata.maps.MapId
-import net.minecraft.world.level.saveddata.maps.MapItemSavedData
-import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.krypt.utils.rendering.Render2D.pushPop
@@ -37,7 +33,7 @@ object ScoreMapLayer {
 
         if (KnitPlayer.player == null || KnitClient.world == null) return cache
 
-        val stack = getMapFromHotbar() ?: return cache
+        val stack = KnitPlayer.player?.inventory?.getItem(8).takeIf { it?.item is MapItem } ?: return cache
         val mapId = stack.get(DataComponents.MAP_ID) ?: return cache
         val mapData = MapItem.getSavedData(mapId, KnitClient.world!!) ?: return cache
 
@@ -46,10 +42,5 @@ object ScoreMapLayer {
         
         cachedRenderState = renderState
         return renderState
-    }
-
-    private fun getMapFromHotbar(): ItemStack? {
-        val stack = KnitPlayer.player?.inventory?.getItem(8) ?: return null
-        return stack.takeIf { it.item is MapItem }
     }
 }

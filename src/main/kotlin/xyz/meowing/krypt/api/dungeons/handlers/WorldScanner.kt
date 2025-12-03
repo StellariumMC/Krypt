@@ -51,7 +51,7 @@ object WorldScanner {
                 EventBus.post(DungeonEvent.Room.Change(prevRoom, currRoom))
             }
 
-            if (lastIdx != idx) {
+            if (lastIdx != idx || (currRoom != null && DungeonAPI.currentRoom == null)) {
                 lastIdx = idx
                 DungeonAPI.currentRoom = currRoom
                 currRoom?.let { room ->
