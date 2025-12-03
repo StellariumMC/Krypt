@@ -138,14 +138,10 @@ object BossMapLayer {
             matrix.scale(scale, scale, 1f)
             //#endif
 
-            val showAsArrow = MapRenderConfig.showOnlyOwnHeadAsArrow && !isOwnPlayer
+            val showAsArrow = MapRenderConfig.showOnlyOwnHeadAsArrow && isOwnPlayer
             val showHead = MapRenderConfig.showPlayerHead && !showAsArrow
 
-            if (showHead) {
-                renderPlayerHead(context, player)
-            } else {
-                renderPlayerArrow(context, isOwnPlayer)
-            }
+            if (showHead) renderPlayerHead(context, player) else renderPlayerArrow(context, isOwnPlayer)
         }
     }
 

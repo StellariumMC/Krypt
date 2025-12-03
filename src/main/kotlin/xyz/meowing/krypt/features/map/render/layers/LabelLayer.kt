@@ -88,26 +88,27 @@ object LabelLayer {
     private fun calculateFittedScale(lines: List<String>, baseScale: Float, room: Room): Float {
         val visualWidth = lines.maxOfOrNull { it.stripColor().width() * baseScale } ?: return baseScale
 
-        val roomWidth = when (room.shape) {
-            RoomShape.SHAPE_1X1 -> RoomLayer.ROOM_RENDER_SIZE
-            RoomShape.SHAPE_1X2 -> {
-                val hasHorizontalLayout = room.components.map { it.first }.toSet().size > 1
-                if (hasHorizontalLayout) RoomLayer.ROOM_RENDER_SIZE * 2 + RoomLayer.ROOM_SPACING - RoomLayer.ROOM_RENDER_SIZE
-                else RoomLayer.ROOM_RENDER_SIZE
+        val minX = room.components.minOf { it.first }
+        val maxX = room.components.maxOf { it.first }
+        val minZ = room.components.minOf { it.second }
+        val maxZ = room.components.maxOf { it.second }
+
+        val widthInComponents = maxX - minX + 1
+        val heightInComponents = maxZ - minZ + 1
+
+        val roomWidth = if (room.shape == RoomShape.SHAPE_L) {
+            val hasTopRow = room.components.any { it.second == minZ }
+            val hasBottomRow = room.components.any { it.second == maxZ }
+
+            if (hasTopRow && hasBottomRow) {
+                RoomLayer.ROOM_RENDER_SIZE * 2 + RoomLayer.ROOM_SPACING - RoomLayer.ROOM_RENDER_SIZE
+            } else {
+                val effectiveWidth = maxOf(widthInComponents, heightInComponents)
+                RoomLayer.ROOM_RENDER_SIZE * effectiveWidth + (RoomLayer.ROOM_SPACING - RoomLayer.ROOM_RENDER_SIZE) * (effectiveWidth - 1)
             }
-            RoomShape.SHAPE_1X3 -> {
-                val hasHorizontalLayout = room.components.map { it.first }.toSet().size > 1
-                if (hasHorizontalLayout) RoomLayer.ROOM_RENDER_SIZE * 3 + (RoomLayer.ROOM_SPACING - RoomLayer.ROOM_RENDER_SIZE) * 2
-                else RoomLayer.ROOM_RENDER_SIZE
-            }
-            RoomShape.SHAPE_1X4 -> {
-                val hasHorizontalLayout = room.components.map { it.first }.toSet().size > 1
-                if (hasHorizontalLayout) RoomLayer.ROOM_RENDER_SIZE * 4 + (RoomLayer.ROOM_SPACING - RoomLayer.ROOM_RENDER_SIZE) * 3
-                else RoomLayer.ROOM_RENDER_SIZE
-            }
-            RoomShape.SHAPE_2X2 -> RoomLayer.ROOM_RENDER_SIZE * 2 + RoomLayer.ROOM_SPACING - RoomLayer.ROOM_RENDER_SIZE
-            RoomShape.SHAPE_L -> RoomLayer.ROOM_RENDER_SIZE * 2 + RoomLayer.ROOM_SPACING - RoomLayer.ROOM_RENDER_SIZE
-            else -> RoomLayer.ROOM_RENDER_SIZE
+        } else {
+            val effectiveWidth = maxOf(widthInComponents, heightInComponents)
+            RoomLayer.ROOM_RENDER_SIZE * effectiveWidth + (RoomLayer.ROOM_SPACING - RoomLayer.ROOM_RENDER_SIZE) * (effectiveWidth - 1)
         }
 
         val maxWidth = (roomWidth - 4).toFloat()

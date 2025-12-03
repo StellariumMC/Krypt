@@ -27,8 +27,9 @@ object DungeonMap : Feature(
     private const val NAME = "Dungeon Map"
 
     override fun addConfig() {
-        addPlayerHeadConfig()
-        addClassColorConfig()
+        addMapToggle()
+        addPlayerConfig()
+        addClassConfig()
         addRoomLabelConfig()
         addRoomColorConfig()
         addDoorColorConfig()
@@ -55,15 +56,35 @@ object DungeonMap : Feature(
         MapRenderer.render(context, x, y, scale)
     }
 
-    private fun addPlayerHeadConfig() {
+    private fun addMapToggle() {
         ConfigManager
             .addFeature(
-                "Dungeon map",
+                "Toggle map",
                 "Enables the dungeon map",
                 "Map",
                 ConfigElement(
                     "dungeonMap",
                     ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Force paul",
+                ConfigElement(
+                    "dungeonMap.forcePaul",
+                    ElementType.Switch(false)
+                )
+            )
+    }
+
+    private fun addPlayerConfig() {
+        ConfigManager
+            .addFeature(
+                "Player icons",
+                "Configure player icon appearance and behavior",
+                "Map",
+                ConfigElement(
+                    "dungeonMap.playerIcons",
+                    ElementType.Switch(true)
                 )
             )
             .addFeatureOption(
@@ -74,45 +95,10 @@ object DungeonMap : Feature(
                 )
             )
             .addFeatureOption(
-                "Player heads under text",
-                ConfigElement(
-                    "dungeonMap.playerHeadsUnder",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Show only own head as arrow",
+                "Only own head as arrow",
                 ConfigElement(
                     "dungeonMap.showOnlyOwnHeadAsArrow",
                     ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Class colored icons",
-                ConfigElement(
-                    "dungeonMap.iconClassColors",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Player icon size",
-                ConfigElement(
-                    "dungeonMap.playerIconSize",
-                    ElementType.Slider(0.1, 2.0, 1.0, true)
-                )
-            )
-            .addFeatureOption(
-                "Player icon border color",
-                ConfigElement(
-                    "dungeonMap.playerIconBorderColor",
-                    ElementType.ColorPicker(Color(0, 0, 0, 255))
-                )
-            )
-            .addFeatureOption(
-                "Player icon border size",
-                ConfigElement(
-                    "dungeonMap.playerIconBorderSize",
-                    ElementType.Slider(0.0, 0.5, 0.2, true)
                 )
             )
             .addFeatureOption(
@@ -130,15 +116,43 @@ object DungeonMap : Feature(
                 )
             )
             .addFeatureOption(
-                "Force paul",
+                "Player heads under text",
                 ConfigElement(
-                    "dungeonMap.forcePaul",
-                    ElementType.Switch(false)
+                    "dungeonMap.playerHeadsUnder",
+                    ElementType.Switch(true)
+                )
+            )
+            .addFeatureOption(
+                "Class colored icons",
+                ConfigElement(
+                    "dungeonMap.iconClassColors",
+                    ElementType.Switch(true)
+                )
+            )
+            .addFeatureOption(
+                "Player icon size",
+                ConfigElement(
+                    "dungeonMap.playerIconSize",
+                    ElementType.Slider(0.1, 2.0, 1.0, true)
+                )
+            )
+            .addFeatureOption(
+                "Player icon border size",
+                ConfigElement(
+                    "dungeonMap.playerIconBorderSize",
+                    ElementType.Slider(0.0, 0.5, 0.2, true)
+                )
+            )
+            .addFeatureOption(
+                "Player icon border color",
+                ConfigElement(
+                    "dungeonMap.playerIconBorderColor",
+                    ElementType.ColorPicker(Color(0, 0, 0, 255))
                 )
             )
     }
 
-    private fun addClassColorConfig() {
+    private fun addClassConfig() {
         ConfigManager
             .addFeature(
                 "Class colors",
@@ -190,7 +204,7 @@ object DungeonMap : Feature(
         ConfigManager
             .addFeature(
                 "Room labels",
-                "Configure room label display",
+                "Configure room name and secret display",
                 "Map",
                 ConfigElement(
                     "dungeonMap.roomLabels",
@@ -198,86 +212,24 @@ object DungeonMap : Feature(
                 )
             )
             .addFeatureOption(
-                "Puzzle room",
+                "Puzzle room display",
                 ConfigElement(
                     "dungeonMap.puzzleCheckmarkMode",
-                    ElementType.Dropdown(
-                        listOf("Nothing", "Name Only", "Secrets Only", "Name & Secrets"),
-                        0
-                    )
+                    ElementType.Dropdown(listOf("Nothing", "Name Only", "Secrets Only", "Name & Secrets"), 0)
                 )
             )
             .addFeatureOption(
-                "Normal room",
+                "Normal room display",
                 ConfigElement(
                     "dungeonMap.normalCheckmarkMode",
-                    ElementType.Dropdown(
-                        listOf("Nothing", "Name Only", "Secrets Only", "Name & Secrets"),
-                        0
-                    )
+                    ElementType.Dropdown(listOf("Nothing", "Name Only", "Secrets Only", "Name & Secrets"), 0)
                 )
             )
             .addFeatureOption(
-                "Checkmark scale",
+                "Room label scale",
                 ConfigElement(
-                    "dungeonMap.checkmarkScale",
+                    "dungeonMap.roomLabelScale",
                     ElementType.Slider(0.5, 2.0, 1.0, true)
-                )
-            )
-            .addFeatureOption(
-                "Text shadow",
-                ConfigElement(
-                    "dungeonMap.textShadow",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Room text not cleared",
-                ConfigElement(
-                    "dungeonMap.roomTextNotClearedColor",
-                    ElementType.MCColorPicker(MCColorCode.GRAY)
-                )
-            )
-            .addFeatureOption(
-                "Room text cleared",
-                ConfigElement(
-                    "dungeonMap.roomTextClearedColor",
-                    ElementType.MCColorPicker(MCColorCode.WHITE)
-                )
-            )
-            .addFeatureOption(
-                "Room text secrets found",
-                ConfigElement(
-                    "dungeonMap.roomTextSecretsColor",
-                    ElementType.MCColorPicker(MCColorCode.GREEN)
-                )
-            )
-            .addFeatureOption(
-                "Room text failed",
-                ConfigElement(
-                    "dungeonMap.roomTextFailedColor",
-                    ElementType.MCColorPicker(MCColorCode.RED)
-                )
-            )
-            .addFeatureOption(
-                "Secrets text not cleared",
-                ConfigElement(
-                    "dungeonMap.secretsTextNotClearedColor",
-                    ElementType.MCColorPicker(MCColorCode.GRAY)
-                )
-            )
-            .addFeatureOption(
-                "Secrets text cleared",
-                ConfigElement(
-                    "dungeonMap.secretsTextClearedColor",
-                    ElementType.MCColorPicker(MCColorCode.WHITE)
-                )
-            )
-            .addFeatureOption(
-                "Secrets text all found",
-                ConfigElement(
-                    "dungeonMap.secretsTextSecretsColor",
-                    ElementType.MCColorPicker(MCColorCode.GREEN)
                 )
             )
             .addFeatureOption(
@@ -288,10 +240,10 @@ object DungeonMap : Feature(
                 )
             )
             .addFeatureOption(
-                "Room label scale",
+                "Text shadow",
                 ConfigElement(
-                    "dungeonMap.roomLabelScale",
-                    ElementType.Slider(0.5, 2.0, 1.0, true)
+                    "dungeonMap.textShadow",
+                    ElementType.Switch(false)
                 )
             )
             .addFeatureOption(
@@ -306,6 +258,105 @@ object DungeonMap : Feature(
                 ConfigElement(
                     "dungeonMap.clearedRoomCheckmarkScale",
                     ElementType.Slider(0.5, 2.0, 1.0, true)
+                )
+            )
+            .addFeatureOption(
+                "Checkmark scale",
+                ConfigElement(
+                    "dungeonMap.checkmarkScale",
+                    ElementType.Slider(0.5, 2.0, 1.0, true)
+                )
+            )
+
+        addRoomTextColors()
+        addSecretsTextColors()
+        addPuzzleIconConfig()
+    }
+
+    private fun addRoomTextColors() {
+        ConfigManager
+            .addFeature(
+                "Room text colors",
+                "Configure room name text colors",
+                "Map",
+                ConfigElement(
+                    "dungeonMap.roomTextColors",
+                    ElementType.Switch(true)
+                )
+            )
+            .addFeatureOption(
+                "Not cleared",
+                ConfigElement(
+                    "dungeonMap.roomTextNotClearedColor",
+                    ElementType.MCColorPicker(MCColorCode.GRAY)
+                )
+            )
+            .addFeatureOption(
+                "Cleared",
+                ConfigElement(
+                    "dungeonMap.roomTextClearedColor",
+                    ElementType.MCColorPicker(MCColorCode.WHITE)
+                )
+            )
+            .addFeatureOption(
+                "Secrets found",
+                ConfigElement(
+                    "dungeonMap.roomTextSecretsColor",
+                    ElementType.MCColorPicker(MCColorCode.GREEN)
+                )
+            )
+            .addFeatureOption(
+                "Failed",
+                ConfigElement(
+                    "dungeonMap.roomTextFailedColor",
+                    ElementType.MCColorPicker(MCColorCode.RED)
+                )
+            )
+    }
+
+    private fun addSecretsTextColors() {
+        ConfigManager
+            .addFeature(
+                "Secrets text colors",
+                "Configure secret count text colors",
+                "Map",
+                ConfigElement(
+                    "dungeonMap.secretsTextColors",
+                    ElementType.Switch(true)
+                )
+            )
+            .addFeatureOption(
+                "Not cleared",
+                ConfigElement(
+                    "dungeonMap.secretsTextNotClearedColor",
+                    ElementType.MCColorPicker(MCColorCode.GRAY)
+                )
+            )
+            .addFeatureOption(
+                "Cleared",
+                ConfigElement(
+                    "dungeonMap.secretsTextClearedColor",
+                    ElementType.MCColorPicker(MCColorCode.WHITE)
+                )
+            )
+            .addFeatureOption(
+                "All found",
+                ConfigElement(
+                    "dungeonMap.secretsTextSecretsColor",
+                    ElementType.MCColorPicker(MCColorCode.GREEN)
+                )
+            )
+    }
+
+    private fun addPuzzleIconConfig() {
+        ConfigManager
+            .addFeature(
+                "Puzzle icons",
+                "Configure puzzle icon display",
+                "Map",
+                ConfigElement(
+                    "dungeonMap.puzzleIcons",
+                    ElementType.Switch(true)
                 )
             )
             .addFeatureOption(
@@ -445,7 +496,7 @@ object DungeonMap : Feature(
         ConfigManager
             .addFeature(
                 "Map display",
-                "Configure map appearance",
+                "Configure overall map appearance",
                 "Map",
                 ConfigElement(
                     "dungeonMap.mapDisplay",
@@ -453,24 +504,17 @@ object DungeonMap : Feature(
                 )
             )
             .addFeatureOption(
-                "Map info under",
+                "Boss map",
                 ConfigElement(
-                    "dungeonMap.mapInfoUnder",
+                    "dungeonMap.bossMap",
                     ElementType.Switch(true)
                 )
             )
             .addFeatureOption(
-                "Info text shadow",
+                "Score map",
                 ConfigElement(
-                    "dungeonMap.infoTextShadow",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Map info scale",
-                ConfigElement(
-                    "dungeonMap.mapInfoScale",
-                    ElementType.Slider(0.3, 1.5, 0.6, true)
+                    "dungeonMap.scoreMap",
+                    ElementType.Switch(true)
                 )
             )
             .addFeatureOption(
@@ -501,18 +545,40 @@ object DungeonMap : Feature(
                     ElementType.ColorPicker(Color(0, 0, 0, 100))
                 )
             )
-            .addFeatureOption(
-                "Boss map",
+
+        addMapInfoConfig()
+    }
+
+    private fun addMapInfoConfig() {
+        ConfigManager
+            .addFeature(
+                "Map info display",
+                "Configure info text below map",
+                "Map",
                 ConfigElement(
-                    "dungeonMap.bossMap",
+                    "dungeonMap.mapInfo",
                     ElementType.Switch(true)
                 )
             )
             .addFeatureOption(
-                "Score map",
+                "Show map info",
                 ConfigElement(
-                    "dungeonMap.scoreMap",
+                    "dungeonMap.mapInfoUnder",
                     ElementType.Switch(true)
+                )
+            )
+            .addFeatureOption(
+                "Info text shadow",
+                ConfigElement(
+                    "dungeonMap.infoTextShadow",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Map info scale",
+                ConfigElement(
+                    "dungeonMap.mapInfoScale",
+                    ElementType.Slider(0.3, 1.5, 0.6, true)
                 )
             )
     }
