@@ -15,6 +15,7 @@ import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.ClientTick
 import xyz.meowing.krypt.features.Feature
+import xyz.meowing.krypt.features.solvers.data.PuzzleTimer
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.glowThisFrame
@@ -170,6 +171,19 @@ object BlazeSolver : Feature(
 
         if (blazes.size == 10 && trueTimeStarted == null) trueTimeStarted = System.currentTimeMillis()
         if (blazes.size == 9 && timeStarted == null) timeStarted = System.currentTimeMillis()
+
+        if (blazes.isEmpty() && lastBlazeCount == 1) {
+            val trueTime = trueTimeStarted ?: return
+            val startTime = timeStarted ?: return
+
+            val solveTime = (System.currentTimeMillis() - startTime).toDouble()
+            val totalTime = (System.currentTimeMillis() - trueTime).toDouble()
+
+            PuzzleTimer.submitTime("Blaze", solveTime, totalTime)
+
+            trueTimeStarted = null
+            timeStarted = null
+        }
 
         lastBlazeCount = blazes.size
     }

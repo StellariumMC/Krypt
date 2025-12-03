@@ -15,6 +15,7 @@ import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.PacketEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
+import xyz.meowing.krypt.features.solvers.data.PuzzleTimer
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render3D
@@ -53,6 +54,9 @@ object TeleportMazeSolver : Feature(
     private var cells: List<Cell>? = null
     private var orderedPads: MutableList<TpPad>? = null
     private var inTpMaze = false
+
+    private var trueTimeStarted: Long? = null
+    private var timeStarted: Long? = null
 
     private val correctPadColor by ConfigDelegate<Color>("tpMazeSolver.correctColor")
     private val wrongPadColor by ConfigDelegate<Color>("tpMazeSolver.wrongColor")
@@ -99,6 +103,7 @@ object TeleportMazeSolver : Feature(
             }
 
             inTpMaze = true
+            trueTimeStarted = System.currentTimeMillis()
 
             val pads = mutableListOf<TpPad>()
             for (dx in 0..31) {
@@ -162,6 +167,8 @@ object TeleportMazeSolver : Feature(
             val oldPad = getPadNear(player!!.x, player!!.z) ?: return@register
             val newPad = getPadNear(pos.x, pos.z) ?: return@register
 
+            if (timeStarted == null) timeStarted = System.currentTimeMillis()
+
             if (isPadInStartOrEndCell(newPad)) {
                 cells!!.forEach { cell ->
                     cell.pads.forEach {
@@ -169,6 +176,15 @@ object TeleportMazeSolver : Feature(
                         it.totalAngle = 0.0
                     }
                 }
+
+                val trueTime = trueTimeStarted ?: return@register
+                val startTime = timeStarted ?: return@register
+
+                val solveTime = (System.currentTimeMillis() - startTime).toDouble()
+                val totalTime = (System.currentTimeMillis() - trueTime).toDouble()
+
+                PuzzleTimer.submitTime("Teleport Maze", solveTime, totalTime)
+                reset()
                 return@register
             }
 
@@ -198,6 +214,8 @@ object TeleportMazeSolver : Feature(
         cells = null
         orderedPads = null
         inTpMaze = false
+        trueTimeStarted = null
+        timeStarted = null
     }
 
     private fun getCellAt(x: Int, z: Int): Cell? {

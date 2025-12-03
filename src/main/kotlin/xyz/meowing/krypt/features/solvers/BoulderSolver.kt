@@ -20,6 +20,7 @@ import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.PacketEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
+import xyz.meowing.krypt.features.solvers.data.PuzzleTimer
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.NetworkUtils
@@ -46,7 +47,8 @@ object BoulderSolver : Feature(
     private var roomCenter = BlockPos(-1, -1, -1)
     private var rotation = 0
 
-    private var startTime: Long? = null
+    private var trueTimeStarted: Long? = null
+    private var timeStarted: Long? = null
 
     private val boxColor by ConfigDelegate<Color>("boulderSolver.boxColor")
     private val clickColor by ConfigDelegate<Color>("boulderSolver.clickColor")
@@ -106,6 +108,7 @@ object BoulderSolver : Feature(
             inBoulder = true
             rotation = 360 - (event.new.rotation.degrees) + 180
             roomCenter = ScanUtils.getRoomCenter(event.new)
+            trueTimeStarted = System.currentTimeMillis()
 
             solve()
         }
@@ -154,8 +157,23 @@ object BoulderSolver : Feature(
             val block = client.level?.getBlockState(blockPos)?.block ?: return@register
 
             when (block) {
-                Blocks.OAK_WALL_SIGN, Blocks.STONE_BUTTON -> currentSolution.find { it.clickPos == blockPos }?.let { currentSolution.remove(it) }
-                Blocks.CHEST -> reset()
+                Blocks.OAK_WALL_SIGN, Blocks.STONE_BUTTON -> {
+                    currentSolution.find { it.clickPos == blockPos }?.let {
+                        currentSolution.remove(it)
+                        if (timeStarted == null) timeStarted = System.currentTimeMillis()
+                    }
+                }
+
+                Blocks.CHEST -> {
+                    val trueTime = trueTimeStarted ?: return@register
+                    val startTime = timeStarted ?: return@register
+
+                    val solveTime = (System.currentTimeMillis() - startTime).toDouble()
+                    val totalTime = (System.currentTimeMillis() - trueTime).toDouble()
+
+                    PuzzleTimer.submitTime("Boulder", solveTime, totalTime)
+                    reset()
+                }
             }
         }
     }
@@ -185,7 +203,8 @@ object BoulderSolver : Feature(
         roomCenter = BlockPos(-1, -1, -1)
         rotation = 0
         currentSolution.clear()
-        startTime = null
+        trueTimeStarted = null
+        timeStarted = null
     }
 
     private fun getVoxelShape(pos: BlockPos, world: ClientLevel): VoxelShape {

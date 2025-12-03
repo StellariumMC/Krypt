@@ -16,6 +16,7 @@ import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.PacketEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
+import xyz.meowing.krypt.features.solvers.data.PuzzleTimer
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render3D
@@ -39,9 +40,12 @@ object ThreeWeirdosSolver : Feature(
     private var correctPos: BlockPos? = null
     private val wrongPositions = ConcurrentHashMap.newKeySet<BlockPos>()
 
+    private var trueTimeStarted: Long? = null
+    private var timeStarted: Long? = null
+
     private val correctChestColor by ConfigDelegate<Color>("weirdosSolver.correctColor")
     private val wrongChestColor by ConfigDelegate<Color>("weirdosSolver.wrongColor")
-    private val highlightWrongChests by ConfigDelegate<Boolean>("weirdosSolver.removeWrongChests")
+    private val highlightWrongChests by ConfigDelegate<Boolean>("weirdosSolver.highlightWrongChests")
 
     override fun addConfig() {
         ConfigManager
@@ -83,6 +87,7 @@ object ThreeWeirdosSolver : Feature(
 
             inWeirdos = true
             rotation = 360 - (event.new.rotation.degrees)
+            trueTimeStarted = System.currentTimeMillis()
         }
 
         register<DungeonEvent.Room.Change> { event ->
@@ -104,7 +109,7 @@ object ThreeWeirdosSolver : Feature(
                 )
             }
 
-            if (!highlightWrongChests) {
+            if (highlightWrongChests) {
                 wrongPositions.forEach { pos ->
                     Render3D.drawSpecialBB(
                         pos,
@@ -124,6 +129,8 @@ object ThreeWeirdosSolver : Feature(
             val (npc, msg) = match.destructured
 
             if (solutions.none { it.matches(msg) } && wrong.none { it.matches(msg) }) return@register
+
+            if (timeStarted == null) timeStarted = System.currentTimeMillis()
 
             val world = KnitClient.world ?: return@register
             val correctNPC = world.entitiesForRendering()
@@ -150,6 +157,13 @@ object ThreeWeirdosSolver : Feature(
             val packet = event.packet as? ServerboundUseItemOnPacket ?: return@register
             if (packet.hitResult.blockPos != correctPos) return@register
 
+            val trueTime = trueTimeStarted ?: return@register
+            val startTime = timeStarted ?: return@register
+
+            val solveTime = (System.currentTimeMillis() - startTime).toDouble()
+            val totalTime = (System.currentTimeMillis() - trueTime).toDouble()
+
+            PuzzleTimer.submitTime("Three Weirdos", solveTime, totalTime)
             reset()
         }
     }
@@ -159,16 +173,8 @@ object ThreeWeirdosSolver : Feature(
         rotation = 0
         correctPos = null
         wrongPositions.clear()
-    }
-
-    private fun rotateBlockPos(pos: BlockPos, degrees: Int): BlockPos {
-        return when ((degrees % 360 + 360) % 360) {
-            0 -> pos
-            90 -> BlockPos(pos.z, pos.y, -pos.x)
-            180 -> BlockPos(-pos.x, pos.y, -pos.z)
-            270 -> BlockPos(-pos.z, pos.y, pos.x)
-            else -> pos
-        }
+        trueTimeStarted = null
+        timeStarted = null
     }
 
     private val solutions = listOf(

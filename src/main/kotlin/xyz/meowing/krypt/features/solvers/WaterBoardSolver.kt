@@ -22,6 +22,7 @@ import xyz.meowing.krypt.events.core.PacketEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.features.Feature
+import xyz.meowing.krypt.features.solvers.data.PuzzleTimer
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.NetworkUtils
@@ -48,6 +49,9 @@ object WaterBoardSolver : Feature(
 
     private var roomCenter: BlockPos? = null
     private var rotation: Int? = null
+
+    private var trueTimeStarted: Long? = null
+    private var timeStarted: Long? = null
 
     private val firstTracerColor by ConfigDelegate<Color>("waterBoardSolver.firstColor")
     private val secondTracerColor by ConfigDelegate<Color>("waterBoardSolver.secondColor")
@@ -99,6 +103,7 @@ object WaterBoardSolver : Feature(
 
             roomCenter = ScanUtils.getRoomCenter(event.new)
             rotation = 360 - (event.new.rotation.degrees)
+            trueTimeStarted = System.currentTimeMillis()
 
             TickScheduler.Server.schedule(15) {
                 KnitChat.modMessage("§7Solving Water Board...")
@@ -106,7 +111,7 @@ object WaterBoardSolver : Feature(
             }
 
             TickScheduler.Server.schedule(30) {
-               solve()
+                solve()
             }
         }
 
@@ -196,12 +201,23 @@ object WaterBoardSolver : Feature(
             val position = packet.hitResult.blockPos
 
             LeverBlock.entries.find { it.getLeverPos() == position }?.let {
-                if (it == LeverBlock.WATER && openedWaterTicks == -1) openedWaterTicks = tickCounter
+                if (it == LeverBlock.WATER && openedWaterTicks == -1) {
+                    openedWaterTicks = tickCounter
+                    if (timeStarted == null) timeStarted = System.currentTimeMillis()
+                }
+
                 it.clickCount++
             }
 
             val block = client.level?.getBlockState(position)?.block
             if (block == Blocks.CHEST && WoolColor.entries.all { !it.isClose() }) {
+                val trueTime = trueTimeStarted ?: return@register
+                val startTime = timeStarted ?: return@register
+
+                val solveTime = (System.currentTimeMillis() - startTime).toDouble()
+                val totalTime = (System.currentTimeMillis() - trueTime).toDouble()
+
+                PuzzleTimer.submitTime("Water Board", solveTime, totalTime)
                 reset()
             }
         }
@@ -265,6 +281,8 @@ object WaterBoardSolver : Feature(
         tickCounter = 0
         roomCenter = null
         rotation = null
+        trueTimeStarted = null
+        timeStarted = null
     }
 
     private fun BlockPos.toCenterVec() = Vec3(x + 0.5, y + 0.5, z + 0.5)

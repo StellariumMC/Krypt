@@ -8,6 +8,7 @@ import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.krypt.Krypt
 import xyz.meowing.krypt.annotations.Command
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
+import xyz.meowing.krypt.features.solvers.data.PuzzleTimer
 import xyz.meowing.krypt.features.waypoints.RoomWaypointHandler
 import xyz.meowing.krypt.features.waypoints.RouteRecorder
 import xyz.meowing.krypt.features.waypoints.WaypointDecoder
@@ -33,6 +34,14 @@ object ConfigCommand : Commodore("krypt") {
             }
         }
 
+        literal("dev") {
+            literal("undoPB") {
+                runs {
+                    PuzzleTimer.undo()
+                }
+            }
+        }
+
         literal("hud") {
             runs {
                 TickScheduler.Client.post {
@@ -44,7 +53,7 @@ object ConfigCommand : Commodore("krypt") {
         literal("modLoaded") {
             runs {
                 Krypt.sendModLoaded = !Krypt.sendModLoaded
-                KnitChat.fakeMessage("${if (Krypt.sendModLoaded) "§aEnabled" else "§cDisabled"} mod load messages!")
+                KnitChat.modMessage("${if (Krypt.sendModLoaded) "§aEnabled" else "§cDisabled"} mod load messages!")
                 Krypt.saveData.forceSave()
             }
         }

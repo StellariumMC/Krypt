@@ -20,12 +20,12 @@ import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.features.Feature
+import xyz.meowing.krypt.features.solvers.data.PuzzleTimer
 import xyz.meowing.krypt.hud.HUDEditor
 import xyz.meowing.krypt.hud.HUDManager
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.NetworkUtils
-import xyz.meowing.krypt.utils.Utils.removeFormatting
 import xyz.meowing.krypt.utils.Utils.toTimerFormat
 import xyz.meowing.krypt.utils.rendering.Render2D
 import xyz.meowing.krypt.utils.rendering.Render3D
@@ -54,6 +54,7 @@ object QuizSolver : Feature(
 
     private var answerTime: Int = 0
     private var questionsStarted = false
+    private var timeStarted: Long? = null
 
     init {
         NetworkUtils.fetchJson<Map<String, List<String>>>(
@@ -123,6 +124,7 @@ object QuizSolver : Feature(
             inQuiz = true
             roomCenter = ScanUtils.getRoomCenter(event.new)
             rotation = 360 - event.new.rotation.degrees
+            timeStarted = System.currentTimeMillis()
 
             triviaOptions[0].blockPos = getRealCoord(BlockPos(5, 70, -9), roomCenter!!, rotation!!)
             triviaOptions[1].blockPos = getRealCoord(BlockPos(0, 70, -6), roomCenter!!, rotation!!)
@@ -145,6 +147,11 @@ object QuizSolver : Feature(
                     answerTime = (7.5 * 20).toInt()
                     if (message.contains("answered the final question")) {
                         questionsStarted = false
+
+                        val startTime = timeStarted ?: return@register
+                        val completionTime = (System.currentTimeMillis() - startTime).toDouble()
+
+                        PuzzleTimer.submitTime("Quiz", completionTime, completionTime)
                         reset()
                     } else if (message.contains("answered Question #")) {
                         triviaOptions.forEach { it.isCorrect = false }
@@ -161,7 +168,7 @@ object QuizSolver : Feature(
                     }
                 }
 
-                message.removeFormatting() == "[STATUE] Oruo the Omniscient: I am Oruo the Omniscient. I have lived many lives. I have learned all there is to know." -> {
+                message == "[STATUE] Oruo the Omniscient: I am Oruo the Omniscient. I have lived many lives. I have learned all there is to know." -> {
                     if (inQuiz) questionsStarted = true
                     answerTime = 11 * 20
                 }
@@ -221,6 +228,9 @@ object QuizSolver : Feature(
             it.isCorrect = false
         }
         triviaAnswers = null
+        questionsStarted = false
+        answerTime = 0
+        timeStarted = null
     }
 
     private fun renderHud(context: GuiGraphics) {

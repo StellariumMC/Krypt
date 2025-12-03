@@ -37,7 +37,9 @@ object TickTimers : Feature(
     private var stormTicks = 20
     private var goldorTicks = 60
     private var purplePadTicks = 670
+
     private var inStorm = false
+    private var inGoldor = false
     private var inTerms = false
     private var isStartTicks = false
     private var startTicks = 104
@@ -67,6 +69,12 @@ object TickTimers : Feature(
                     ElementType.Switch(false)
                 )
             )
+            .addFeatureOption("Goldor ticks",
+                ConfigElement(
+                    "tickTimers.goldorTicks",
+                    ElementType.Switch(false)
+                )
+            )
             .addFeatureOption(
                 "Purple pad timer",
                 ConfigElement(
@@ -74,12 +82,6 @@ object TickTimers : Feature(
                     ElementType.Switch(false)
                 )
             )
-            // .addFeatureOption("Goldor Ticks (Coming Soon)",
-            //     ConfigElement(
-            //         "tickTimers.goldorTicks",
-            //         ElementType.Switch(false)
-            //     )
-            // )
             .addFeatureOption(
                 "HudEditor",
                 ConfigElement(
@@ -135,8 +137,14 @@ object TickTimers : Feature(
                     isStartTicks = true
                 }
 
+                "[BOSS] Goldor: Who dares trespass into my domain?" -> {
+                    inGoldor = true
+                    goldorTicks = 60
+                }
+
                 "The Core entrance is opening!" -> {
                     inTerms = false
+                    inGoldor = false
                 }
             }
         }
@@ -144,6 +152,7 @@ object TickTimers : Feature(
         register<LocationEvent.WorldChange> {
             inTerms = false
             inStorm = false
+            inGoldor = false
             isStartTicks = false
         }
     }
@@ -168,10 +177,11 @@ object TickTimers : Feature(
             val text = "§5Purple Pad §f: $color${(purplePadTicks / 20f).toTimerFormat()}"
             Render2D.renderStringWithShadow(context, text, x - (client.font.width(text) / 2f) * scale, y + 15 * scale, scale)
         }
-//        if (goldorTicksToggled && inTerms) {
-//            val color = if (goldorTicks <= 20) "§c" else if (goldorTicks <= 40) "§6" else "§a"
-//            Render2D.renderStringWithShadow(context, if (isStartTicks) "§a$startTicks" else "$color$goldorTicks", x, y, scale)
-//        }
 
+        if (goldorTicksToggled && inGoldor) {
+            val seconds = goldorTicks / 20
+            val color = if (seconds <= 1.0) "§c" else if (seconds <= 2.0) "§6" else "§a"
+            Render2D.renderStringWithShadow(context, "$color%.2f".format(seconds), x, y, scale)
+        }
     }
 }

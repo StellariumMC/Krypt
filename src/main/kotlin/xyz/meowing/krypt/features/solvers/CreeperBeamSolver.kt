@@ -13,6 +13,7 @@ import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.events.core.WorldEvent
 import xyz.meowing.krypt.features.Feature
+import xyz.meowing.krypt.features.solvers.data.PuzzleTimer
 import xyz.meowing.krypt.managers.config.ConfigElement
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.NetworkUtils
@@ -38,6 +39,9 @@ object CreeperBeamSolver : Feature(
     private var inCreeperBeams = false
     private var roomCenter = BlockPos(-1, -1, -1)
     private var rotation = 0
+
+    private var trueTimeStarted: Long? = null
+    private var timeStarted: Long? = null
 
     private val colorPool = listOf(
         Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW,
@@ -106,6 +110,7 @@ object CreeperBeamSolver : Feature(
             rotation = 360 - (event.new.rotation.degrees) + 180
 
             roomCenter = ScanUtils.getRoomCenter(event.new)
+            trueTimeStarted = System.currentTimeMillis()
 
             solve()
         }
@@ -137,7 +142,20 @@ object CreeperBeamSolver : Feature(
             if (!inCreeperBeams || !removeOnClick) return@register
 
             if (event.old.block == Blocks.SEA_LANTERN && event.new.block != Blocks.SEA_LANTERN) {
+                if (timeStarted == null) timeStarted = System.currentTimeMillis()
+
                 currentSolve.removeIf { it.start == event.pos || it.end == event.pos }
+
+                if (currentSolve.isEmpty()) {
+                    val trueTime = trueTimeStarted ?: return@register
+                    val startTime = timeStarted ?: return@register
+
+                    val solveTime = (System.currentTimeMillis() - startTime).toDouble()
+                    val totalTime = (System.currentTimeMillis() - trueTime).toDouble()
+
+                    PuzzleTimer.submitTime("Creeper Beams", solveTime, totalTime)
+                    reset()
+                }
             }
         }
     }
@@ -173,5 +191,7 @@ object CreeperBeamSolver : Feature(
         currentSolve.clear()
         roomCenter = BlockPos(-1, -1, -1)
         rotation = 0
+        trueTimeStarted = null
+        timeStarted = null
     }
 }
