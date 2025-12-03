@@ -9,7 +9,6 @@ import net.minecraft.client.resources.PlayerSkin
 import net.minecraft.world.item.ItemStack
 import net.minecraft.network.chat.Component
 import net.minecraft.util.CommonColors
-import net.minecraft.resources.ResourceLocation
 import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
 import xyz.meowing.knit.api.KnitClient.client
 import java.awt.Color
@@ -134,14 +133,6 @@ object Render2D {
         }
 
         PlayerFaceRenderer.draw(context, textures, x, y, size)
-    }
-
-    fun drawImage(ctx: GuiGraphics, image: ResourceLocation, x: Int, y: Int, width: Int, height: Int) {
-        //#if MC >= 1.21.7
-        //$$ ctx.blitSprite(RenderPipelines.GUI_TEXTURED, image, x, y, width, height)
-        //#else
-        ctx.blitSprite(RenderType::guiTextured, image, x, y, width, height)
-        //#endif
     }
 
     fun drawRect(ctx: GuiGraphics, x: Int, y: Int, width: Int, height: Int, color: Color = Color.WHITE) {

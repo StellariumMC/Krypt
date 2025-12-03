@@ -8,18 +8,18 @@ enum class PuzzleType(
     val icon: ResourceLocation,
     var checkmark: Checkmark? = null
 ) {
-    UNKNOWN("???", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/clear/question_mark")),
-    HIGHER_BLAZE("Higher Blaze", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/puzzles/blaze")),
-    LOWER_BLAZE("Lower Blaze", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/puzzles/blaze")),
-    BEAMS("Creeper Beams", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/puzzles/beam")),
-    WEIRDOS("Three Weirdos", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/puzzles/weirdos")),
-    TIC_TAC_TOE("Tic Tac Toe", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/puzzles/ttt")),
-    WATER_BOARD("Water Board", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/puzzles/water")),
-    TELEPORT_MAZE("Teleport Maze", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/puzzles/tp_maze")),
-    BOULDER("Boulder", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/puzzles/boulder")),
-    ICE_FILL("Ice Fill", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/puzzles/ice_fill")),
-    ICE_PATH("Ice Path", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/puzzles/ice_path")),
-    QUIZ("Quiz", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/puzzles/quiz"))
+    UNKNOWN("???", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/clear/question_mark.png")),
+    HIGHER_BLAZE("Higher Blaze", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/puzzles/blaze.png")),
+    LOWER_BLAZE("Lower Blaze", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/puzzles/blaze.png")),
+    BEAMS("Creeper Beams", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/puzzles/beam.png")),
+    WEIRDOS("Three Weirdos", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/puzzles/weirdos.png")),
+    TIC_TAC_TOE("Tic Tac Toe", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/puzzles/ttt.png")),
+    WATER_BOARD("Water Board", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/puzzles/water.png")),
+    TELEPORT_MAZE("Teleport Maze", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/puzzles/tp_maze.png")),
+    BOULDER("Boulder", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/puzzles/boulder.png")),
+    ICE_FILL("Ice Fill", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/puzzles/ice_fill.png")),
+    ICE_PATH("Ice Path", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/puzzles/ice_path.png")),
+    QUIZ("Quiz", ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/puzzles/quiz.png"))
     ;
 
     companion object {

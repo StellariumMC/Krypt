@@ -20,9 +20,9 @@ object DungeonMap : Feature(
     "dungeonMap",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
-    val defaultMap: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/default_map")
-    val markerSelf: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/marker_self")
-    val markerOther: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/marker_other")
+    val defaultMap: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/default_map.png")
+    val markerSelf: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/marker_self.png")
+    val markerOther: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/marker_other.png")
 
     private const val NAME = "Dungeon Map"
 
@@ -316,6 +316,13 @@ object DungeonMap : Feature(
                 )
             )
             .addFeatureOption(
+                "Tint puzzle icons",
+                ConfigElement(
+                    "dungeonMap.tintPuzzleIcons",
+                    ElementType.Switch(true)
+                )
+            )
+            .addFeatureOption(
                 "Puzzle icon scale",
                 ConfigElement(
                     "dungeonMap.puzzleIconScale",
@@ -429,7 +436,7 @@ object DungeonMap : Feature(
                 "Entrance door",
                 ConfigElement(
                     "dungeonMap.entranceDoorColor",
-                    ElementType.ColorPicker(Color(0, 204, 0, 255))
+                    ElementType.ColorPicker(Color(20, 133, 0, 255))
                 )
             )
     }

@@ -37,6 +37,7 @@
         val scaleTextToFitRoom by ConfigDelegate<Boolean>("dungeonMap.scaleTextToFitRoom")
         val renderPuzzleIcons by ConfigDelegate<Boolean>("dungeonMap.renderPuzzleIcons")
         val puzzleIconScale by ConfigDelegate<Double>("dungeonMap.puzzleIconScale")
+        val tintPuzzleIcons by ConfigDelegate<Boolean>("dungeonMap.tintPuzzleIcons")
 
         val showClearedRoomCheckmarks by ConfigDelegate<Boolean>("dungeonMap.showClearedRoomCheckmarks")
         val clearedRoomCheckmarkScale by ConfigDelegate<Double>("dungeonMap.clearedRoomCheckmarkScale")

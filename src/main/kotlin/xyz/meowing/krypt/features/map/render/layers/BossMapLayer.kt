@@ -3,7 +3,9 @@ package xyz.meowing.krypt.features.map.render.layers
 import com.mojang.math.Axis
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.resources.ResourceLocation
+import tech.thatgravyboat.skyblockapi.platform.drawTexture
 import xyz.meowing.knit.api.KnitPlayer
+import xyz.meowing.krypt.Krypt
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.enums.DungeonClass
 import xyz.meowing.krypt.api.dungeons.enums.DungeonPlayer
@@ -51,9 +53,8 @@ object BossMapLayer {
     }
 
     private fun renderMapImage(context: GuiGraphics, image: String, offsetX: Double, offsetY: Double, scale: Double) {
-        val texture = ResourceLocation.fromNamespaceAndPath("krypt", "krypt/boss/$image")
-        Render2D.drawImage(
-            context,
+        val texture = ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/boss/$image.png")
+        context.drawTexture(
             texture,
             (-offsetX + 5).toInt(),
             (-offsetY + 5).toInt(),
@@ -169,7 +170,7 @@ object BossMapLayer {
 
     private fun renderPlayerArrow(context: GuiGraphics, isOwnPlayer: Boolean) {
         val icon = if (isOwnPlayer) DungeonMap.markerSelf else DungeonMap.markerOther
-        Render2D.drawImage(context, icon, -4, -5, 7, 10)
+        context.drawTexture(icon, -4, -5, 7, 10)
     }
 
     data class BossMapData(

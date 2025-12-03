@@ -30,9 +30,9 @@ enum class Checkmark {
         }
 
     companion object {
-        val greenCheck: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/clear/green_check")
-        val whiteCheck: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/clear/white_check")
-        val failedRoom: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/clear/failed_room")
-        val questionMark: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "krypt/clear/question_mark")
+        val greenCheck: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/clear/green_check.png")
+        val whiteCheck: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/clear/white_check.png")
+        val failedRoom: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/clear/failed_room.png")
+        val questionMark: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Krypt.NAMESPACE, "dungeons/map/clear/question_mark.png")
     }
 }

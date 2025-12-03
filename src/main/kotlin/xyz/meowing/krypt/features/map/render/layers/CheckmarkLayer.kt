@@ -1,6 +1,7 @@
 package xyz.meowing.krypt.features.map.render.layers
 
 import net.minecraft.client.gui.GuiGraphics
+import tech.thatgravyboat.skyblockapi.platform.drawTexture
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.enums.map.Checkmark
 import xyz.meowing.krypt.api.dungeons.enums.map.PuzzleType
@@ -8,7 +9,6 @@ import xyz.meowing.krypt.api.dungeons.enums.map.Room
 import xyz.meowing.krypt.api.dungeons.enums.map.RoomType
 import xyz.meowing.krypt.features.map.render.MapRenderConfig
 import xyz.meowing.krypt.features.map.render.MapRenderer.translateAndScale
-import xyz.meowing.krypt.utils.rendering.Render2D
 import xyz.meowing.krypt.utils.rendering.Render2D.pushPop
 
 object CheckmarkLayer {
@@ -24,7 +24,7 @@ object CheckmarkLayer {
 
             context.pushPop {
                 translateAndScale(context, x.toFloat(), y.toFloat(), MapRenderConfig.checkmarkScale.toFloat())
-                Render2D.drawImage(context, Checkmark.questionMark, -5, -6, 10, 12)
+                context.drawTexture(Checkmark.questionMark, -5, -6, 10, 12)
             }
         }
     }
@@ -41,8 +41,7 @@ object CheckmarkLayer {
 
             if (
                 MapRenderConfig.renderPuzzleIcons &&
-                isPuzzle &&
-                room.checkmark == Checkmark.NONE
+                isPuzzle
                 ) {
                 renderPuzzleIcon(context, room.name, x, y)
                 return@forEach
@@ -53,7 +52,7 @@ object CheckmarkLayer {
 
             context.pushPop {
                 translateAndScale(context, x.toFloat(), y.toFloat(), scale)
-                Render2D.drawImage(context, checkmark, -6, -6, 12, 12)
+                context.drawTexture(checkmark, -6, -6, 12, 12)
             }
         }
     }
@@ -63,7 +62,21 @@ object CheckmarkLayer {
             val scale = (MapRenderConfig.puzzleIconScale * MapRenderConfig.checkmarkScale).toFloat()
             translateAndScale(context, x.toFloat(), y.toFloat(), scale)
             val offset = if (puzzleName == "Teleport Maze") -8 else -6
-            Render2D.drawImage(context, PuzzleType.getPuzzleIcon(puzzleName), -6, offset, 12, 12)
+
+            if (MapRenderConfig.tintPuzzleIcons) {
+                val room = DungeonAPI.uniqueRooms.find { it.name == puzzleName }
+
+                val tint = when (room?.checkmark) {
+                    Checkmark.GREEN -> 0xFF00FF00.toInt()
+                    Checkmark.WHITE -> 0xFFFFFF00.toInt()
+                    Checkmark.FAILED -> 0xFFFF0000.toInt()
+                    else -> 0xFFFFFFFF.toInt()
+                }
+
+                context.drawTexture(PuzzleType.getPuzzleIcon(puzzleName), -6, offset, 12, 12, color = tint)
+            } else {
+                context.drawTexture(PuzzleType.getPuzzleIcon(puzzleName), -6, offset, 12, 12)
+            }
         }
     }
 

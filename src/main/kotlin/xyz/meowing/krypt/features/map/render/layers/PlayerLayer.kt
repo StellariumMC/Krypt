@@ -2,6 +2,7 @@ package xyz.meowing.krypt.features.map.render.layers
 
 import com.mojang.math.Axis
 import net.minecraft.client.gui.GuiGraphics
+import tech.thatgravyboat.skyblockapi.platform.drawTexture
 import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.enums.DungeonClass
@@ -83,7 +84,7 @@ object PlayerLayer {
 
     private fun renderPlayerArrow(context: GuiGraphics, isOwnPlayer: Boolean) {
         val icon = if (isOwnPlayer) DungeonMap.markerSelf else DungeonMap.markerOther
-        Render2D.drawImage(context, icon, -4, -5, 7, 10)
+        context.drawTexture(icon, -4, -5, 7, 10)
     }
 
     private fun renderNametag(context: GuiGraphics, name: String, x: Float, y: Float) {

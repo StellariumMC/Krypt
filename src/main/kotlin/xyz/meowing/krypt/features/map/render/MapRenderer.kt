@@ -1,10 +1,8 @@
 package xyz.meowing.krypt.features.map.render
 
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.resources.ResourceLocation
-import xyz.meowing.knit.api.KnitChat
+import tech.thatgravyboat.skyblockapi.platform.drawTexture
 import xyz.meowing.knit.api.KnitPlayer
-import xyz.meowing.krypt.Krypt
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.features.map.DungeonMap
 import xyz.meowing.krypt.features.map.render.layers.*
@@ -47,7 +45,7 @@ object MapRenderer {
             //#endif
 
             renderBackground(context)
-            Render2D.drawImage(context, DungeonMap.defaultMap, 5, 5, 128, 128)
+            context.drawTexture(DungeonMap.defaultMap, 5, 5, 128, 128)
             if (MapRenderConfig.mapInfoUnder) renderPreviewInfo(context)
         }
     }
