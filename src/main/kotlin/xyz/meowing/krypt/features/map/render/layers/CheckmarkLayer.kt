@@ -7,7 +7,7 @@ import xyz.meowing.krypt.api.dungeons.enums.map.Checkmark
 import xyz.meowing.krypt.api.dungeons.enums.map.PuzzleType
 import xyz.meowing.krypt.api.dungeons.enums.map.Room
 import xyz.meowing.krypt.api.dungeons.enums.map.RoomType
-import xyz.meowing.krypt.features.map.render.MapRenderConfig
+import xyz.meowing.krypt.features.map.DungeonMap
 import xyz.meowing.krypt.features.map.render.MapRenderer.translateAndScale
 import xyz.meowing.krypt.utils.rendering.Render2D.pushPop
 
@@ -23,7 +23,7 @@ object CheckmarkLayer {
             val y = room.z * RoomLayer.ROOM_SPACING + RoomLayer.ROOM_RENDER_SIZE / 2
 
             context.pushPop {
-                translateAndScale(context, x.toFloat(), y.toFloat(), MapRenderConfig.checkmarkScale.toFloat())
+                translateAndScale(context, x.toFloat(), y.toFloat(), DungeonMap.checkmarkScale.toFloat())
                 context.drawTexture(Checkmark.questionMark, -5, -6, 10, 12)
             }
         }
@@ -36,11 +36,11 @@ object CheckmarkLayer {
             val (centerX, centerZ) = RoomLayer.getRoomCenter(room)
             val x = (centerX * RoomLayer.ROOM_SPACING).toInt() + RoomLayer.ROOM_RENDER_SIZE / 2
             val y = (centerZ * RoomLayer.ROOM_SPACING).toInt() + RoomLayer.ROOM_RENDER_SIZE / 2
-            val showCleared = MapRenderConfig.showClearedRoomCheckmarks && room.checkmark != Checkmark.UNEXPLORED
+            val showCleared = DungeonMap.showClearedRoomCheckmarks && room.checkmark != Checkmark.UNEXPLORED
             val isPuzzle = room.type == RoomType.PUZZLE
 
             if (
-                MapRenderConfig.renderPuzzleIcons &&
+                DungeonMap.renderPuzzleIcons &&
                 isPuzzle
                 ) {
                 renderPuzzleIcon(context, room.name, x, y)
@@ -48,7 +48,7 @@ object CheckmarkLayer {
             }
 
             val checkmark = getCheckmarkImage(room, showCleared, isPuzzle) ?: return@forEach
-            val scale = if (showCleared) MapRenderConfig.clearedRoomCheckmarkScale.toFloat() else MapRenderConfig.checkmarkScale.toFloat()
+            val scale = if (showCleared) DungeonMap.clearedRoomCheckmarkScale.toFloat() else DungeonMap.checkmarkScale.toFloat()
 
             context.pushPop {
                 translateAndScale(context, x.toFloat(), y.toFloat(), scale)
@@ -59,11 +59,11 @@ object CheckmarkLayer {
 
     private fun renderPuzzleIcon(context: GuiGraphics, puzzleName: String?, x: Int, y: Int) {
         context.pushPop {
-            val scale = (MapRenderConfig.puzzleIconScale * MapRenderConfig.checkmarkScale).toFloat()
+            val scale = (DungeonMap.puzzleIconScale * DungeonMap.checkmarkScale).toFloat()
             translateAndScale(context, x.toFloat(), y.toFloat(), scale)
             val offset = if (puzzleName == "Teleport Maze") -8 else -6
 
-            if (MapRenderConfig.tintPuzzleIcons) {
+            if (DungeonMap.tintPuzzleIcons) {
                 val room = DungeonAPI.uniqueRooms.find { it.name == puzzleName }
 
                 val tint = when (room?.checkmark) {

@@ -27,42 +27,21 @@ import xyz.meowing.krypt.utils.rendering.Render2D
 @Module
 object MaskTimer : Feature(
     "maskTimers",
+    "Mask timers",
+    "Shows alerts on mask proc and mask timers",
+    "General",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
-
     private const val NAME = "Mask Timers"
 
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Mask timers",
-                "Mask Timers",
-                "General",
-                ConfigElement(
-                    "maskTimers",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Send chat message",
-                ConfigElement(
-                    "maskTimers.message",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Always display timer",
-                ConfigElement(
-                    "maskTimers.alwaysDisplay",
-                    ElementType.Switch(true)
-                )
-            )
-    }
+    private val message by config.switch("Send chat message", false)
+    private val alwaysDisplay by config.switch("Always display timer", true)
 
     private enum class Mask {
         SPIRIT,
         BONZO,
         PHOENIX
+        ;
     }
 
     private var BonzoTicks = 0.0
@@ -72,9 +51,6 @@ object MaskTimer : Feature(
     private var hasSpiritMask = false
     private var hasBonzoMask = false
     private val BonzoRegex = "^Your (?:. )?Bonzo's Mask saved your life!$".toRegex()
-
-    private val message by ConfigDelegate<Boolean>("maskTimers.message")
-    private val alwaysDisplay by ConfigDelegate<Boolean>("maskTimers.alwaysDisplay")
 
     private val tickCall: EventCall = EventBus.register<TickEvent.Server> {
         updateTimers()
@@ -117,16 +93,14 @@ object MaskTimer : Feature(
                     SpiritTicks = DungeonAPI.getMageReduction(30.0) * 20
                     tickCall.register()
 
-                    if (message)
-                        sendChatMessage(Mask.SPIRIT)
+                    if (message) sendChatMessage(Mask.SPIRIT)
                 }
 
                 text == ("Your Phoenix Pet saved you from certain death!") -> {
                     PhoenixTicks = 1200.0
                     tickCall.register()
 
-                    if (message)
-                        sendChatMessage(Mask.PHOENIX)
+                    if (message) sendChatMessage(Mask.PHOENIX)
                 }
             }
         }
@@ -144,15 +118,15 @@ object MaskTimer : Feature(
     private fun sendChatMessage(mask: Mask) {
         when (mask) {
             Mask.BONZO -> {
-                KnitChat.sendMessage("/pc Bonzo proceed")
+                KnitChat.sendCommand("pc Bonzo proceed")
             }
 
             Mask.SPIRIT -> {
-                KnitChat.sendMessage("/pc Spirit proceed")
+                KnitChat.sendCommand("pc Spirit proceed")
             }
 
             Mask.PHOENIX -> {
-                KnitChat.sendMessage("/pc Phoenix proceed")
+                KnitChat.sendCommand("pc Phoenix proceed")
             }
         }
     }
@@ -211,16 +185,16 @@ object MaskTimer : Feature(
     private fun getActiveMasks(): List<MaskData> {
         val masks = mutableListOf<MaskData>()
 
-        val bonzoTimer = if (BonzoTicks > 0) String.format("%.1fs", BonzoTicks / 20.0) else "AVAILABLE"
-        if (bonzoTimer != "AVAILABLE" || alwaysDisplay)
+        val bonzoTimer = if (BonzoTicks > 0) String.format("%.1fs", BonzoTicks / 20.0) else "✔"
+        if (bonzoTimer != "✔" || alwaysDisplay)
             masks.add(MaskData(BonzoMask, bonzoTimer, if (BonzoTicks > 0) "§c" else "§a", hasBonzoMask))
 
-        val spiritTimer = if (SpiritTicks > 0) String.format("%.1fs", SpiritTicks / 20.0) else "AVAILABLE"
-        if (spiritTimer != "AVAILABLE" || alwaysDisplay)
+        val spiritTimer = if (SpiritTicks > 0) String.format("%.1fs", SpiritTicks / 20.0) else "✔"
+        if (spiritTimer != "✔" || alwaysDisplay)
             masks.add(MaskData(SpiritMask, spiritTimer, if (SpiritTicks > 0) "§c" else "§a", hasSpiritMask))
 
-        val phoenixTimer = if (PhoenixTicks > 0) String.format("%.1fs", PhoenixTicks / 20.0) else "AVAILABLE"
-        if (phoenixTimer != "AVAILABLE" || alwaysDisplay)
+        val phoenixTimer = if (PhoenixTicks > 0) String.format("%.1fs", PhoenixTicks / 20.0) else "✔"
+        if (phoenixTimer != "✔" || alwaysDisplay)
             masks.add(
                 MaskData(
                     Phoenix,

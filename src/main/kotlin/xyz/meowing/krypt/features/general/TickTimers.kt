@@ -3,40 +3,37 @@ package xyz.meowing.krypt.features.general
 import net.minecraft.client.gui.GuiGraphics
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import xyz.meowing.knit.api.KnitClient.client
-import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.ChatEvent
 import xyz.meowing.krypt.events.core.GuiEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.ScoreboardEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.hud.HUDEditor
 import xyz.meowing.krypt.hud.HUDManager
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.Utils.toTimerFormat
 import xyz.meowing.krypt.utils.rendering.Render2D
 
 @Module
 object TickTimers : Feature(
     "tickTimers",
+    "Phase tick timers",
+    "Shows the ticks of the current phase.",
+    "General",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private const val NAME = "Tick Timers"
-    private val secretTicksToggled by ConfigDelegate<Boolean>("tickTimers.secretTicks")
-    private val stormTicksToggled by ConfigDelegate<Boolean>("tickTimers.stormTicks")
-    private val purplePadTimerToggled by ConfigDelegate<Boolean>("tickTimers.purplePadTimer")
-    private val goldorTicksToggled by ConfigDelegate<Boolean>("tickTimers.goldorTicks")
+    private val secretTicks by config.switch("Secret ticks")
+    private val stormTicks by config.switch("Storm ticks")
+    private val goldorTicks by config.switch("Goldor ticks")
+    private val purplePadTimer by config.switch("Purple pad timer")
 
-    private var secretTicks = 20
-    private var stormTicks = 20
-    private var goldorTicks = 60
-    private var purplePadTicks = 670
+    private var _secretTicks = 20
+    private var _stormTicks = 20
+    private var _goldorTicks = 60
+    private var _purplePadTicks = 670
 
     private var inStorm = false
     private var inGoldor = false
@@ -44,79 +41,28 @@ object TickTimers : Feature(
     private var isStartTicks = false
     private var startTicks = 104
 
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Phase tick timers",
-                "Shows the ticks of the current phase.",
-                "General",
-                ConfigElement(
-                    "tickTimers",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Secret ticks",
-                ConfigElement(
-                    "tickTimers.secretTicks",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Storm ticks",
-                ConfigElement(
-                    "tickTimers.stormTicks",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption("Goldor ticks",
-                ConfigElement(
-                    "tickTimers.goldorTicks",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Purple pad timer",
-                ConfigElement(
-                    "tickTimers.purplePadTimer",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "HudEditor",
-                ConfigElement(
-                    "tickTimers.hudEditor",
-                    ElementType.Button("Edit Position") {
-                        TickScheduler.Client.post {
-                            client.execute { client.setScreen(HUDEditor()) }
-                        }
-                    }
-                )
-            )
-    }
-
     override fun initialize() {
         HUDManager.register(NAME, "§a17", "tickTimers")
 
         register<GuiEvent.Render.HUD> { renderHud(it.context) }
 
         register<TickEvent.Server> {
-            if (secretTicks > 0) secretTicks--
+            if (_secretTicks > 0) _secretTicks--
 
             if (startTicks == 0) isStartTicks = false
             if (startTicks >= 0) startTicks--
 
-            if (goldorTicks == 0) goldorTicks = 61
-            if (goldorTicks >= 0) goldorTicks--
+            if (_goldorTicks == 0) _goldorTicks = 61
+            if (_goldorTicks >= 0) _goldorTicks--
 
-            if (stormTicks == 0) stormTicks = 20
-            if (stormTicks >= 0) stormTicks--
+            if (_stormTicks == 0) _stormTicks = 20
+            if (_stormTicks >= 0) _stormTicks--
 
-            if (purplePadTicks >= 0) purplePadTicks--
+            if (_purplePadTicks >= 0) _purplePadTicks--
         }
 
         register<ScoreboardEvent.Update> {
-            secretTicks = 20
+            _secretTicks = 20
         }
 
         register<ChatEvent.Receive> { event ->
@@ -125,8 +71,8 @@ object TickTimers : Feature(
             when (message) {
                 "[BOSS] Storm: Pathetic Maxor, just like expected." -> {
                     inStorm = true
-                    stormTicks = 20
-                    purplePadTicks = 670
+                    _stormTicks = 20
+                    _purplePadTicks = 670
                 }
 
                 "[BOSS] Storm: I should have known that I stood no chance." -> {
@@ -139,7 +85,7 @@ object TickTimers : Feature(
 
                 "[BOSS] Goldor: Who dares trespass into my domain?" -> {
                     inGoldor = true
-                    goldorTicks = 60
+                    _goldorTicks = 60
                 }
 
                 "The Core entrance is opening!" -> {
@@ -162,24 +108,24 @@ object TickTimers : Feature(
         val y = HUDManager.getY(NAME)
         val scale = HUDManager.getScale(NAME)
 
-        if (secretTicksToggled && !DungeonAPI.inBoss) {
-            val color = if (secretTicks <= 5) "§c" else if (secretTicks <= 10) "§6" else "§a"
-            Render2D.renderStringWithShadow(context, "$color$secretTicks", x, y, scale)
+        if (secretTicks && !DungeonAPI.inBoss) {
+            val color = if (_secretTicks <= 5) "§c" else if (_secretTicks <= 10) "§6" else "§a"
+            Render2D.renderStringWithShadow(context, "$color$_secretTicks", x, y, scale)
         }
 
-        if (stormTicksToggled && inStorm) {
-            val color = if (stormTicks <= 5) "§c" else if (stormTicks <= 10) "§6" else "§a"
-            Render2D.renderStringWithShadow(context, "$color$stormTicks", x, y, scale)
+        if (stormTicks && inStorm) {
+            val color = if (_stormTicks <= 5) "§c" else if (_stormTicks <= 10) "§6" else "§a"
+            Render2D.renderStringWithShadow(context, "$color$_stormTicks", x, y, scale)
         }
 
-        if (inStorm && purplePadTimerToggled && purplePadTicks > 0) {
-            val color = if (purplePadTicks <= 20) "§c" else if (purplePadTicks <= 5*20) "§6" else "§a"
-            val text = "§5Purple Pad §f: $color${(purplePadTicks / 20f).toTimerFormat()}"
+        if (inStorm && purplePadTimer && _purplePadTicks > 0) {
+            val color = if (_purplePadTicks <= 20) "§c" else if (_purplePadTicks <= 5*20) "§6" else "§a"
+            val text = "§5Purple Pad §f: $color${(_purplePadTicks / 20f).toTimerFormat()}"
             Render2D.renderStringWithShadow(context, text, x - (client.font.width(text) / 2f) * scale, y + 15 * scale, scale)
         }
 
-        if (goldorTicksToggled && inGoldor) {
-            val seconds = goldorTicks / 20
+        if (goldorTicks && inGoldor) {
+            val seconds = _goldorTicks / 20
             val color = if (seconds <= 1.0) "§c" else if (seconds <= 2.0) "§6" else "§a"
             Render2D.renderStringWithShadow(context, "$color%.2f".format(seconds), x, y, scale)
         }

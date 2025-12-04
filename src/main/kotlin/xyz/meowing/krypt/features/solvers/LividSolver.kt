@@ -1,7 +1,5 @@
 package xyz.meowing.krypt.features.solvers
 
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.utils.rendering.Render3D
 import net.minecraft.world.level.block.Blocks
@@ -24,8 +22,6 @@ import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.events.core.WorldEvent
 import xyz.meowing.krypt.hud.HUDManager
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.TitleUtils
 import xyz.meowing.krypt.utils.Utils.toFloatArray
 import xyz.meowing.krypt.utils.glowThisFrame
@@ -36,6 +32,9 @@ import java.awt.Color
 @Module
 object LividSolver : Feature(
     "lividSolver",
+    "Livid solver",
+    "Shows the correct Livid in F5/M5",
+    "Solvers",
     dungeonFloor = listOf(DungeonFloor.F5, DungeonFloor.M5)
 ) {
     private var currentLivid = Livid.HOCKEY
@@ -64,51 +63,10 @@ object LividSolver : Feature(
         var entity: Player? = null
     }
 
-    private val lividSolverColor by ConfigDelegate<Color>("lividSolver.color")
-    private val lividSolverLine by ConfigDelegate<Boolean>("lividSolver.line")
-    private val iceSprayTimer by ConfigDelegate<Boolean>("lividSolver.iceSprayTimer")
-    private val ticksInsteadOfTime by ConfigDelegate<Boolean>("lividSolver.ticksInsteadOfTime")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Livid solver",
-                "Shows the correct Livid in F5/M5",
-                "Solvers",
-                ConfigElement(
-                    "lividSolver",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Highlight correct livid color",
-                ConfigElement(
-                    "lividSolver.color",
-                    ElementType.ColorPicker(Color(0, 255, 255, 127))
-                )
-            )
-            .addFeatureOption(
-                "Tracer",
-                ConfigElement(
-                    "lividSolver.line",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Ice spray timer",
-                ConfigElement(
-                    "lividSolver.iceSprayTimer",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Ticks instead of time",
-                ConfigElement(
-                    "lividSolver.ticksInsteadOfTime",
-                    ElementType.Switch(true)
-                )
-            )
-    }
+    private val color by config.colorPicker("Color", Color(0, 255, 255, 127))
+    private val line by config.switch("Tracer", false)
+    private val iceSprayTimer by config.switch("Ice spray timer", false)
+    private val ticksInsteadOfTime by config.switch("Ticks instead of time", true)
 
     override fun initialize() {
         HUDManager.register(NAME, "§bIce spray in: §f13.4s", "lividSolver.iceSprayTimer")
@@ -118,7 +76,7 @@ object LividSolver : Feature(
 
             if (currentLivid.entity == entity && player?.hasLineOfSight(entity) == true) {
                 entity.glowThisFrame = true
-                entity.glowingColor = lividSolverColor.rgb
+                entity.glowingColor = color.rgb
             }
         }
 
@@ -128,8 +86,8 @@ object LividSolver : Feature(
                     entity,
                     event.context.consumers(),
                     event.context.matrixStack(),
-                    lividSolverColor.toFloatArray(),
-                    lividSolverColor.alpha.toFloat()
+                    color.toFloatArray(),
+                    color.alpha.toFloat()
                 )
             }
         }
@@ -192,7 +150,7 @@ object LividSolver : Feature(
 
     private fun registerRender() {
         registerEvent("renderLivid")
-        if (lividSolverLine) registerEvent("renderLine")
+        if (line) registerEvent("renderLine")
     }
 
     private fun unregisterRender() {

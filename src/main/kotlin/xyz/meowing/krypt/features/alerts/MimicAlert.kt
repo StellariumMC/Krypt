@@ -3,59 +3,23 @@ package xyz.meowing.krypt.features.alerts
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.TitleUtils
 
 @Module
 object MimicAlert : Feature(
     "mimicAlert",
+    "Mimic alert",
+    "Alerts on mimic death",
+    "Alerts",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Mimic alert",
-                "Mimic alert",
-                "Alerts",
-                ConfigElement(
-                    "mimicAlert",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Show title",
-                ConfigElement(
-                    "mimicAlert.showTitle",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Send chat message",
-                ConfigElement(
-                    "mimicAlert.sendMessage",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Mimic message",
-                ConfigElement(
-                    "mimicAlert.message",
-                    ElementType.TextInput("Mimic Killed!")
-                )
-            )
-    }
-
-    private val message by ConfigDelegate<String>("mimicAlert.message")
-    private val sendMessage by ConfigDelegate<Boolean>("mimicAlert.sendMessage")
-    private val showTitle by ConfigDelegate<Boolean>("mimicAlert.showTitle")
-    private val enabled by ConfigDelegate<Boolean>("mimicAlert")
+    private val showTitle by config.switch("Show title", true)
+    private val sendMessage by config.switch("Send chat message", true)
+    private val message by config.textInput("Mimic message", "Mimic Killed!")
 
     fun displayTitle() {
-        if (!enabled) return
+        if (!config()) return
 
         if (showTitle) TitleUtils.showTitle("§b$message", duration = 2000)
         if (sendMessage) KnitChat.sendMessage("/pc $message")

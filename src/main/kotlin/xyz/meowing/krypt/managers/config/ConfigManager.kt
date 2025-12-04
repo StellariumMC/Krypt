@@ -15,7 +15,6 @@ import xyz.meowing.krypt.api.data.StoredFile
 import xyz.meowing.krypt.config.ui.ClickGUI
 import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.feature.FeatureManager
 import xyz.meowing.krypt.utils.Utils.toColorFromMap
 import java.awt.Color
 
@@ -113,8 +112,6 @@ object ConfigManager {
 
     fun createConfigUI() {
         configUI = ClickGUI
-
-        FeatureManager.features.forEach { it.addConfig() }
     }
 
     fun executePending() {

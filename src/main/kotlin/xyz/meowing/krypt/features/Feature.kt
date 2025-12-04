@@ -3,6 +3,7 @@
 package xyz.meowing.krypt.features
 
 import xyz.meowing.knit.api.events.Event
+import xyz.meowing.knit.api.events.EventCall
 import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.knit.api.scheduler.TimeScheduler
 import xyz.meowing.krypt.Krypt
@@ -11,24 +12,33 @@ import xyz.meowing.krypt.api.dungeons.enums.DungeonFloor
 import xyz.meowing.krypt.api.location.LocationAPI
 import xyz.meowing.krypt.api.location.SkyBlockArea
 import xyz.meowing.krypt.api.location.SkyBlockIsland
+import xyz.meowing.krypt.config.dsl.ConfigBuilder
 import xyz.meowing.krypt.events.EventBus
 import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.managers.feature.FeatureManager
 
 open class Feature(
     val configKey: String? = null,
+    configName: String? = null,
+    configDescription: String? = null,
+    configCategory: String? = null,
+    configDefault: Boolean = false,
     val skyblockOnly: Boolean = false,
     island: Any? = null,
     area: Any? = null,
     dungeonFloor: Any? = null
 ) {
-    val events = mutableListOf<xyz.meowing.knit.api.events.EventCall>()
+    val events = mutableListOf<EventCall>()
     val tickHandles = mutableSetOf<TickScheduler.Handle>()
     val timeHandles = mutableSetOf<TimeScheduler.Handle>()
     val timerIds = mutableSetOf<Long>()
-    val namedEventCalls = mutableMapOf<String, xyz.meowing.knit.api.events.EventCall>()
+    val namedEventCalls = mutableMapOf<String, EventCall>()
     private var setupLoops: (() -> Unit)? = null
     private var isRegistered = false
+
+    private var _configBuilder: ConfigBuilder? = null
+    val config: ConfigBuilder
+        get() = _configBuilder ?: throw IllegalStateException("Config not initialized for feature without config parameters")
 
     private val islands: List<SkyBlockIsland> = when (island) {
         is SkyBlockIsland -> listOf(island)
@@ -50,6 +60,16 @@ open class Feature(
 
     init {
         FeatureManager.addFeature(this)
+
+        if (configKey != null && configName != null && configDescription != null && configCategory != null) {
+            _configBuilder = ConfigBuilder(
+                configKey,
+                configName,
+                configDescription,
+                configCategory,
+                configDefault
+            )
+        }
     }
 
     private fun checkConfig(): Boolean {
@@ -76,8 +96,6 @@ open class Feature(
     open fun onUnregister() {
         cancelLoops()
     }
-
-    open fun addConfig() {}
 
     fun isEnabled(): Boolean = checkConfig() && inSkyblock() && inArea() && inSubarea() && inDungeonFloor()
 

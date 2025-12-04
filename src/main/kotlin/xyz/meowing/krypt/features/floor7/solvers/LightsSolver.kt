@@ -9,18 +9,16 @@ import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.enums.DungeonFloor
 import xyz.meowing.krypt.api.dungeons.enums.DungeonPhase
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render3D
-import java.awt.Color
 
 @Module
 object LightsSolver : Feature(
     "lightsSolver",
+    "Lights solver",
+    "Displays the fastest solution for lights device",
+    "Floor 7",
     dungeonFloor = listOf(DungeonFloor.F7, DungeonFloor.M7)
 ) {
     private val blocks = listOf(
@@ -32,27 +30,7 @@ object LightsSolver : Feature(
         BlockPos(58, 133, 142)
     )
 
-    private val color by ConfigDelegate<Color>("lightsSolver.color")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Lights solver",
-                "Displays the fastest solution for lights device",
-                "Floor 7",
-                ConfigElement(
-                    "lightsSolver",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Highlight color",
-                ConfigElement(
-                    "lightsSolver.color",
-                    ElementType.ColorPicker(Color(0, 255, 255, 127))
-                )
-            )
-    }
+    private val color by config.colorPicker("Highlight color")
 
     override fun initialize() {
         register<RenderEvent.World.Last> { event ->

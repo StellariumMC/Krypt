@@ -5,34 +5,21 @@ import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.ChatEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.modMessage
 
 @Module
 object TerminalTracker : Feature(
     "terminalTracker",
+    "Terminal tracker",
+    "Tracks terminal/device/lever completions in dungeons",
+    "Floor 7",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private val completed: MutableMap<String, MutableMap<String, Int>> = mutableMapOf()
     private val pattern = Regex("""^(?<user>\w{1,16}) (?:activated|completed) a (?<type>\w+)! \(\d/\d\)$""")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Terminal tracker",
-                "Tracks terminal/device/lever completions in dungeons",
-                "Floor 7",
-                ConfigElement(
-                    "terminalTracker",
-                    ElementType.Switch(false)
-                )
-            )
-    }
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->

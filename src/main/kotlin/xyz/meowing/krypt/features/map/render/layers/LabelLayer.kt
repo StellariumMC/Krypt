@@ -7,7 +7,7 @@ import xyz.meowing.krypt.api.dungeons.enums.map.Checkmark
 import xyz.meowing.krypt.api.dungeons.enums.map.Room
 import xyz.meowing.krypt.api.dungeons.enums.map.RoomShape
 import xyz.meowing.krypt.api.dungeons.enums.map.RoomType
-import xyz.meowing.krypt.features.map.render.MapRenderConfig
+import xyz.meowing.krypt.features.map.DungeonMap
 import xyz.meowing.krypt.utils.rendering.Render2D
 import xyz.meowing.krypt.utils.rendering.Render2D.pushPop
 import xyz.meowing.krypt.utils.rendering.Render2D.width
@@ -18,8 +18,8 @@ object LabelLayer {
             if (!room.explored) return@forEach
 
             val checkmarkMode = when (room.type) {
-                RoomType.PUZZLE -> MapRenderConfig.puzzleCheckmarkMode
-                RoomType.NORMAL, RoomType.YELLOW, RoomType.TRAP, RoomType.UNKNOWN -> MapRenderConfig.normalCheckmarkMode
+                RoomType.PUZZLE -> DungeonMap.puzzleCheckmarkMode
+                RoomType.NORMAL, RoomType.YELLOW, RoomType.TRAP, RoomType.UNKNOWN -> DungeonMap.normalCheckmarkMode
                 else -> return@forEach
             }
 
@@ -33,16 +33,16 @@ object LabelLayer {
         val secrets = if (room.checkmark == Checkmark.GREEN) room.secrets else room.secretsFound
 
         val roomNameColor = when (room.checkmark) {
-            Checkmark.FAILED -> MapRenderConfig.roomTextFailedColor.code
-            Checkmark.GREEN -> MapRenderConfig.roomTextSecretsColor.code
-            Checkmark.WHITE -> MapRenderConfig.roomTextClearedColor.code
-            else -> MapRenderConfig.roomTextNotClearedColor.code
+            Checkmark.FAILED -> DungeonMap.roomTextFailedColor.code
+            Checkmark.GREEN -> DungeonMap.roomTextSecretsColor.code
+            Checkmark.WHITE -> DungeonMap.roomTextClearedColor.code
+            else -> DungeonMap.roomTextNotClearedColor.code
         }
 
         val secretsColor = when (room.checkmark) {
-            Checkmark.GREEN -> MapRenderConfig.secretsTextSecretsColor.code
-            Checkmark.WHITE -> MapRenderConfig.secretsTextClearedColor.code
-            else -> MapRenderConfig.secretsTextNotClearedColor.code
+            Checkmark.GREEN -> DungeonMap.secretsTextSecretsColor.code
+            Checkmark.WHITE -> DungeonMap.secretsTextClearedColor.code
+            else -> DungeonMap.secretsTextNotClearedColor.code
         }
 
         val roomText = room.name ?: "???"
@@ -59,8 +59,8 @@ object LabelLayer {
         }
 
         val (centerX, centerZ) = RoomLayer.getRoomCenter(room)
-        val baseScale = (0.75f * MapRenderConfig.roomLabelScale).toFloat()
-        val scale = if (MapRenderConfig.scaleTextToFitRoom) calculateFittedScale(lines, baseScale, room) else baseScale
+        val baseScale = (0.75f * DungeonMap.roomLabelScale).toFloat()
+        val scale = if (DungeonMap.scaleTextToFitRoom) calculateFittedScale(lines, baseScale, room) else baseScale
 
         context.pushPop {
             val matrix = context.pose()
@@ -76,7 +76,7 @@ object LabelLayer {
                 val drawX = (-line.width() / 2).toFloat()
                 val drawY = (9 * i - (lines.size * 9) / 2).toFloat()
 
-                if (MapRenderConfig.textShadow) {
+                if (DungeonMap.textShadow) {
                     renderTextShadow(context, line.stripColor(), drawX.toInt(), drawY.toInt(), scale)
                 }
 

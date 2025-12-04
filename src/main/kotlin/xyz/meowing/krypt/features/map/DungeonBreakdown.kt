@@ -10,30 +10,18 @@ import xyz.meowing.krypt.api.dungeons.enums.map.RoomType
 import xyz.meowing.krypt.api.dungeons.handlers.DungeonPlayerManager
 import xyz.meowing.krypt.api.hypixel.HypixelAPI
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.DungeonEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.modMessage
 
 @Module
 object DungeonBreakdown : Feature(
     "dungeonBreakdown",
+    "Dungeon breakdown",
+    "Shows a breakdown of all player's run stats at the end of the run",
+    "General",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
-    override fun addConfig() {
-        ConfigManager.addFeature(
-            "Dungeon breakdown",
-            "Shows a breakdown of all player's run stats at the end of the run",
-            "General",
-            ConfigElement(
-                "dungeonBreakdown",
-                ElementType.Switch(false)
-            )
-        )
-    }
-
     override fun initialize() {
         register<DungeonEvent.End> {
             val totalPlayers = DungeonPlayerManager.players.filterNotNull().size

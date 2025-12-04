@@ -7,71 +7,22 @@ import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.enums.DungeonClass
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import java.awt.Color
 
 @Module
 object TeammateHighlight : Feature(
     "teammateHighlight",
+    "Teammate highlight",
+    "Highlights teammates in dungeons",
+    "Highlights",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
-    private val mageColor by ConfigDelegate<Color>("teammateHighlight.mageColor")
-    private val archerColor by ConfigDelegate<Color>("teammateHighlight.archerColor")
-    private val healerColor by ConfigDelegate<Color>("teammateHighlight.healerColor")
-    private val tankColor by ConfigDelegate<Color>("teammateHighlight.tankColor")
-    private val bersColor by ConfigDelegate<Color>("teammateHighlight.bersColor")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Teammate highlight",
-                "Highlights teammates in dungeons",
-                "Highlights",
-                ConfigElement(
-                    "teammateHighlight",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Mage color",
-                ConfigElement(
-                    "teammateHighlight.mageColor",
-                    ElementType.ColorPicker(Color(85, 255, 255))
-                )
-            )
-            .addFeatureOption(
-                "Archer color",
-                ConfigElement(
-                    "teammateHighlight.archerColor",
-                    ElementType.ColorPicker(Color(255, 170, 0))
-                )
-            )
-            .addFeatureOption(
-                "Healer color",
-                ConfigElement(
-                    "teammateHighlight.healerColor",
-                    ElementType.ColorPicker( Color(255, 85, 255))
-                )
-            )
-            .addFeatureOption(
-                "Tank color",
-                ConfigElement(
-                    "teammateHighlight.tankColor",
-                    ElementType.ColorPicker(Color(0, 170, 0))
-                )
-            )
-            .addFeatureOption(
-                "Berserk color",
-                ConfigElement(
-                    "teammateHighlight.bersColor",
-                    ElementType.ColorPicker( Color(170, 0, 0))
-                )
-            )
-    }
+    private val mageColor by config.colorPicker("Mage color", Color(85, 255, 255))
+    private val archerColor by config.colorPicker("Archer color", Color(255, 170, 0))
+    private val healerColor by config.colorPicker("Healer color", Color(255, 85, 255))
+    private val tankColor by config.colorPicker("Tank color", Color(0, 170, 0))
+    private val bersColor by config.colorPicker("Berserk color", Color(170, 0, 0))
 
     @JvmStatic
     fun getTeammateColor(entity: Entity): Int? {

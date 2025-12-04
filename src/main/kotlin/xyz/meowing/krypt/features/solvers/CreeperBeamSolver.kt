@@ -6,16 +6,12 @@ import xyz.meowing.krypt.Krypt
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.utils.ScanUtils
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.DungeonEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.events.core.WorldEvent
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.features.solvers.data.PuzzleTimer
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.NetworkUtils
 import xyz.meowing.krypt.utils.WorldUtils
 import xyz.meowing.krypt.utils.rendering.Render3D
@@ -29,6 +25,9 @@ import java.awt.Color
 @Module
 object CreeperBeamSolver : Feature(
     "creeperBeamSolver",
+    "Creeper beam solver",
+    "Highlights beam pairs in Creeper Beams room",
+    "Solvers",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private data class BeamPair(val start: BlockPos, val end: BlockPos, val color: Color)
@@ -48,9 +47,9 @@ object CreeperBeamSolver : Feature(
         Color.CYAN, Color.ORANGE, Color.WHITE, Color.MAGENTA
     )
 
-    private val showLines by ConfigDelegate<Boolean>("creeperBeamSolver.showLines")
-    private val phaseThrough by ConfigDelegate<Boolean>("creeperBeamSolver.phase")
-    private val removeOnClick by ConfigDelegate<Boolean>("creeperBeamSolver.removeOnClick")
+    private val showLines by config.switch("Show lines", true)
+    private val phase by config.switch("Phase through walls", true)
+    private val removeOnClick by config.switch("Remove on click", true)
 
     init {
         NetworkUtils.fetchJson<List<List<List<Int>>>>(
@@ -66,40 +65,6 @@ object CreeperBeamSolver : Feature(
                 Krypt.LOGGER.error("Caught error while trying to load Creeper Beam solutions: $error")
             }
         )
-    }
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Creeper beam solver",
-                "Highlights beam pairs in Creeper Beams room",
-                "Solvers",
-                ConfigElement(
-                    "creeperBeamSolver",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Show lines",
-                ConfigElement(
-                    "creeperBeamSolver.showLines",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Phase through walls",
-                ConfigElement(
-                    "creeperBeamSolver.phase",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Remove on click",
-                ConfigElement(
-                    "creeperBeamSolver.removeOnClick",
-                    ElementType.Switch(true)
-                )
-            )
     }
 
     override fun initialize() {
@@ -127,8 +92,8 @@ object CreeperBeamSolver : Feature(
             currentSolve.forEach { (start, end, color) ->
                 if (!isBeamBlock(start) || !isBeamBlock(end)) return@forEach
 
-                Render3D.drawSpecialBB(start, color, event.context.consumers(), event.context.matrixStack(), phaseThrough)
-                Render3D.drawSpecialBB(end, color, event.context.consumers(), event.context.matrixStack(), phaseThrough)
+                Render3D.drawSpecialBB(start, color, event.context.consumers(), event.context.matrixStack(), phase)
+                Render3D.drawSpecialBB(end, color, event.context.consumers(), event.context.matrixStack(), phase)
 
                 if (showLines) {
                     val startVec = start.center

@@ -28,8 +28,8 @@ object MapRenderer {
             //#endif
 
             when {
-                DungeonAPI.floorCompleted && MapRenderConfig.scoreMapEnabled -> renderScore(context)
-                DungeonAPI.inBoss && MapRenderConfig.bossMapEnabled -> renderBoss(context)
+                DungeonAPI.floorCompleted && DungeonMap.scoreMap -> renderScore(context)
+                DungeonAPI.inBoss && DungeonMap.bossMap -> renderBoss(context)
                 !DungeonAPI.floorCompleted && !DungeonAPI.inBoss -> renderMain(context)
             }
         }
@@ -46,15 +46,15 @@ object MapRenderer {
 
             renderBackground(context)
             context.drawTexture(DungeonMap.defaultMap, 5, 5, 128, 128)
-            if (MapRenderConfig.mapInfoUnder) renderPreviewInfo(context)
+            if (DungeonMap.mapInfoUnder) renderPreviewInfo(context)
         }
     }
 
     private fun renderMain(context: GuiGraphics) {
         renderBackground(context)
         renderMainMap(context)
-        if (MapRenderConfig.mapInfoUnder) renderInfo(context)
-        if (MapRenderConfig.mapBorder) renderBorder(context)
+        if (DungeonMap.mapInfoUnder) renderInfo(context)
+        if (DungeonMap.mapBorder) renderBorder(context)
     }
 
     private fun renderBoss(context: GuiGraphics) {
@@ -66,15 +66,15 @@ object MapRenderer {
         val bossMap = BossMapRegistry.getBossMap(floor, playerPos) ?: return
 
         BossMapLayer.render(context, bossMap)
-        if (MapRenderConfig.mapInfoUnder) renderInfo(context)
-        if (MapRenderConfig.mapBorder) renderBorder(context)
+        if (DungeonMap.mapInfoUnder) renderInfo(context)
+        if (DungeonMap.mapBorder) renderBorder(context)
     }
 
     private fun renderScore(context: GuiGraphics) {
         renderBackground(context)
         ScoreMapLayer.render(context)
-        if (MapRenderConfig.mapInfoUnder) renderInfo(context)
-        if (MapRenderConfig.mapBorder) renderBorder(context)
+        if (DungeonMap.mapInfoUnder) renderInfo(context)
+        if (DungeonMap.mapBorder) renderBorder(context)
     }
 
     private fun renderMainMap(context: GuiGraphics) {
@@ -85,22 +85,22 @@ object MapRenderer {
             translateAndScale(context, 5f, 5f, mapScale, mapOffset)
 
             RoomLayer.render(context)
-            if (!MapRenderConfig.playerHeadsUnder) PlayerLayer.render(context)
+            if (!DungeonMap.playerHeadsUnder) PlayerLayer.render(context)
             CheckmarkLayer.render(context)
             LabelLayer.render(context)
-            if (MapRenderConfig.playerHeadsUnder) PlayerLayer.render(context)
+            if (DungeonMap.playerHeadsUnder) PlayerLayer.render(context)
         }
     }
 
     private fun renderBackground(context: GuiGraphics) {
-        val height = MAP_SIZE + if (MapRenderConfig.mapInfoUnder) 10 else 0
-        Render2D.drawRect(context, 0, 0, MAP_SIZE, height, MapRenderConfig.mapBackgroundColor)
+        val height = MAP_SIZE + if (DungeonMap.mapInfoUnder) 10 else 0
+        Render2D.drawRect(context, 0, 0, MAP_SIZE, height, DungeonMap.mapBackgroundColor)
     }
 
     private fun renderBorder(context: GuiGraphics) {
-        val borderWidth = MapRenderConfig.mapBorderWidth
-        val height = MAP_SIZE + if (MapRenderConfig.mapInfoUnder) 10 else 0
-        val color = MapRenderConfig.mapBorderColor
+        val borderWidth = DungeonMap.mapBorderWidth
+        val height = MAP_SIZE + if (DungeonMap.mapInfoUnder) 10 else 0
+        val color = DungeonMap.mapBorderColor
 
         Render2D.drawRect(context, -borderWidth, -borderWidth, MAP_SIZE + borderWidth * 2, borderWidth, color)
         Render2D.drawRect(context, -borderWidth, height, MAP_SIZE + borderWidth * 2, borderWidth, color)
@@ -109,7 +109,7 @@ object MapRenderer {
     }
 
     private fun renderInfo(context: GuiGraphics) {
-        val scale = MapRenderConfig.mapInfoScale.toFloat()
+        val scale = DungeonMap.mapInfoScale.toFloat()
         val line1 = DungeonAPI.mapLine1
         val line2 = DungeonAPI.mapLine2
 
@@ -126,7 +126,7 @@ object MapRenderer {
             val w1 = line1.width().toFloat()
             val w2 = line2.width().toFloat()
 
-            val style = if (MapRenderConfig.mapInfoShadow) Render2D.TextStyle.DROP_SHADOW else Render2D.TextStyle.DEFAULT
+            val style = if (DungeonMap.infoTextShadow) Render2D.TextStyle.DROP_SHADOW else Render2D.TextStyle.DEFAULT
 
             Render2D.renderString(context, line1, -w1 / 2f, 0f, 1f, textStyle = style)
             Render2D.renderString(context, line2, -w2 / 2f, 10f, 1f, textStyle = style)
@@ -134,7 +134,7 @@ object MapRenderer {
     }
 
     private fun renderPreviewInfo(context: GuiGraphics) {
-        val scale = MapRenderConfig.mapInfoScale.toFloat()
+        val scale = DungeonMap.mapInfoScale.toFloat()
         val line1 = "§7Secrets: §b?    §7Crypts: §c0    §7Mimic: §c✘"
         val line2 = "§7Min Secrets: §b?    §7Deaths: §a0    §7Score: §c0"
 
@@ -151,7 +151,7 @@ object MapRenderer {
             val w1 = line1.width().toFloat()
             val w2 = line2.width().toFloat()
 
-            val style = if (MapRenderConfig.mapInfoShadow) Render2D.TextStyle.DROP_SHADOW else Render2D.TextStyle.DEFAULT
+            val style = if (DungeonMap.infoTextShadow) Render2D.TextStyle.DROP_SHADOW else Render2D.TextStyle.DEFAULT
 
             Render2D.renderString(context, line1, -w1 / 2f, 0f, 1f, textStyle = style)
             Render2D.renderString(context, line2, -w2 / 2f, 10f, 1f, textStyle = style)

@@ -2,8 +2,6 @@ package xyz.meowing.krypt.features.general
 
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findGroup
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitPlayer.player
@@ -12,38 +10,19 @@ import xyz.meowing.knit.api.text.core.ClickEvent
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.location.SkyBlockIsland
 import xyz.meowing.krypt.events.core.ChatEvent
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.modMessage
 
 @Module
 object ArchitectDraft : Feature(
     "architectDraft",
+    "Architect draft message",
+    "Sends a message in chat for you to get an architect's draft if a puzzle is failed",
+    "General",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private val puzzleFailRegex = Regex("^PUZZLE FAIL! (?<player>\\w{1,16}) .+$")
     private val quizFailRegex = Regex("^\\[STATUE] Oruo the Omniscient: (?<player>\\w{1,16}) chose the wrong answer! I shall never forget this moment of misrememberance\\.$")
-    private val onlySelf by ConfigDelegate<Boolean>("architectDraft.onlySelf")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Architect draft message",
-                "",
-                "General",
-                ConfigElement(
-                    "architectDraft",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Only for yourself",
-                ConfigElement(
-                    "architectDraft.onlySelf",
-                    ElementType.Switch(false)
-                )
-            )
-    }
+    private val onlySelf by config.switch("Only for yourself")
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->

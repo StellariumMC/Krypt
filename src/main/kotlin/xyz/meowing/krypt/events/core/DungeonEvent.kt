@@ -35,6 +35,12 @@ sealed class DungeonEvent {
         val floor: DungeonFloor
     ) : Event()
 
+    sealed class Player {
+        class Death(
+            val player: DungeonPlayer
+        ) : Event()
+    }
+
     sealed class Room {
         class Change(
             val old: xyz.meowing.krypt.api.dungeons.enums.map.Room,

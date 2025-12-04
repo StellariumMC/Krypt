@@ -11,11 +11,8 @@ import xyz.meowing.krypt.annotations.Command
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.data.StoredFile
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render3D
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
@@ -24,20 +21,11 @@ import xyz.meowing.krypt.events.core.TickEvent
 @Module
 object PositionalMessage : Feature(
     "positionalMsg",
+    "Positional message",
+    "Use \"/krypt pos help\" for more info",
+    "General",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
-    override fun addConfig() {
-        ConfigManager.addFeature(
-            "Positional message",
-            "use \"/krypt pos help\" for more info",
-            "General",
-            ConfigElement(
-                "positionalMsg",
-                ElementType.Switch(false)
-            )
-        )
-    }
-
     private data class PosMsg(val pos: Vec3, val radius: Float, val message: String, var sentMessage: Boolean = false) {
         val radiusSquared: Float
             get() = radius * radius
@@ -46,12 +34,12 @@ object PositionalMessage : Feature(
     private val configCache: HashMap<String, MutableList<PosMsg>> = HashMap<String, MutableList<PosMsg>>()
     private var posMsgList: MutableList<PosMsg> = mutableListOf<PosMsg>()
     private val posMsgData = StoredFile("features/PosMsg")
-    var config by posMsgData.jsonObject("posMsgData")
     private var currentConfig: String = "default"
+    var jsonObject by posMsgData.jsonObject("posMsgData")
 
     override fun initialize() {
-        if (!config.has("config")) config.addProperty("config", "default")
-        switchConfig(config.get("config").asString)
+        if (!jsonObject.has("config")) jsonObject.addProperty("config", "default")
+        switchConfig(jsonObject.get("config").asString)
 
         register<RenderEvent.World.Last> { event ->
             if (!DungeonAPI.inBoss) return@register
@@ -112,14 +100,14 @@ object PositionalMessage : Feature(
         posMsgList.forEach { element ->
             jsonArray.add(createJsonObject(element))
         }
-        config.add(currentConfig, jsonArray)
+        jsonObject.add(currentConfig, jsonArray)
 
-        config.addProperty("config", currentConfig)
+        jsonObject.addProperty("config", currentConfig)
         posMsgData.forceSave()
     }
 
     fun saveConfig() {
-        config.addProperty("config", currentConfig)
+        jsonObject.addProperty("config", currentConfig)
         posMsgData.forceSave()
     }
 
@@ -135,13 +123,13 @@ object PositionalMessage : Feature(
 
         posMsgList = mutableListOf()
 
-        if (!config.has(newConfig)) {
-            config.add(newConfig, JsonArray())
+        if (!jsonObject.has(newConfig)) {
+            jsonObject.add(newConfig, JsonArray())
             configCache[newConfig] = posMsgList
             return
         }
 
-        config.get(newConfig).asJsonArray.forEach { element ->
+        jsonObject.get(newConfig).asJsonArray.forEach { element ->
             posMsgList.add(getDataClass(element.asJsonObject))
         }
 
@@ -159,7 +147,7 @@ object PositionalMessage : Feature(
     }
 
     fun listConfigs() {
-        config.entrySet().forEach { entry ->
+        jsonObject.entrySet().forEach { entry ->
             if (entry.key != "config") {
                 KnitChat.fakeMessage(entry.key)
             }
@@ -270,7 +258,8 @@ private enum class PosMsgProperties(private val s: String) {
     Y("y"),
     Z("z"),
     RADIUS("radius"),
-    MESSAGE("message");
+    MESSAGE("message")
+    ;
 
     override fun toString() = s
 }

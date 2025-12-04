@@ -1,23 +1,16 @@
 package xyz.meowing.krypt.features.general
 
 import net.minecraft.client.gui.GuiGraphics
-import xyz.meowing.knit.api.KnitClient.client
-import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.enums.DungeonFloor
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.ChatEvent
 import xyz.meowing.krypt.events.core.DungeonEvent
 import xyz.meowing.krypt.events.core.GuiEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.hud.HUDEditor
 import xyz.meowing.krypt.hud.HUDManager
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.Utils.toTimerFormat
 import xyz.meowing.krypt.utils.rendering.Render2D
 import xyz.meowing.krypt.utils.rendering.Render2D.pushPop
@@ -26,13 +19,16 @@ import java.awt.Color
 @Module
 object SplitTimers : Feature(
     "splitTimers",
+    "Split timers",
+    "Shows the splits times of your dungeon run.",
+    "General",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private const val NAME = "Split Timers"
 
     private var ticks = 0L
 
-    private var timerStyle by ConfigDelegate<Int>("splitTimers.timerStyle")
+    private val timerStyle by config.dropdown("Timer style", listOf("Milliseconds", "Ticks", "Both"))
 
     private val shownList = mutableListOf<Split>()
 
@@ -55,38 +51,6 @@ object SplitTimers : Feature(
         init {
             shownList.add(this)
         }
-    }
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature("Split timers",
-                "Shows the splits times of your dungeon run.",
-                "General",
-                ConfigElement(
-                    "splitTimers",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Timer style",
-                ConfigElement(
-                    "splitTimers.timerStyle",
-                    ElementType.Dropdown(
-                        listOf("Milliseconds", "Ticks", "Both"),
-                        0
-                    )
-                )
-            )
-            .addFeatureOption("HudEditor",
-                ConfigElement(
-                    "splitTimers.hudEditor",
-                    ElementType.Button("Edit Position") {
-                        TickScheduler.Client.post {
-                            client.execute { client.setScreen(HUDEditor()) }
-                        }
-                    }
-                )
-            )
     }
 
     override fun initialize() {

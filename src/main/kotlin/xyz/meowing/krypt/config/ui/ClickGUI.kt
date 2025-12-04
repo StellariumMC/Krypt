@@ -1,5 +1,6 @@
 package xyz.meowing.krypt.config.ui
 
+import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.input.KnitKeyboard
 import xyz.meowing.knit.api.render.KnitResolution
 import xyz.meowing.vexel.core.VexelScreen

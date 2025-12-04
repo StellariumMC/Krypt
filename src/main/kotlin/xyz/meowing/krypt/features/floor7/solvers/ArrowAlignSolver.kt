@@ -12,14 +12,10 @@ import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.enums.DungeonFloor
 import xyz.meowing.krypt.api.dungeons.enums.DungeonPhase
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.EntityEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render3D
 
 /**
@@ -30,10 +26,13 @@ import xyz.meowing.krypt.utils.rendering.Render3D
 @Module
 object ArrowAlignSolver : Feature(
     "arrowAlignSolver",
+    "Arrow-Align solver",
+    "Shows clicks needed for Arrow Align in F7/M7",
+    "Floor 7",
     dungeonFloor = listOf(DungeonFloor.F7, DungeonFloor.M7)
 ) {
-    private val blockWrong by ConfigDelegate<Boolean>("arrowAlignSolver.blockWrong")
-    private val blockWrongType by ConfigDelegate<Int>("arrowAlignSolver.blockWrongType")
+    private val blockWrong by config.switch("Block wrong clicks")
+    private val blockWrongType by config.dropdown("Block when", listOf("Always", "When crouching", "Not crouching"))
 
     private val checkPos = Vec3(0.0, 120.0, 77.0)
     private val frameGridCorner = BlockPos(-2, 120, 75)
@@ -53,36 +52,6 @@ object ArrowAlignSolver : Feature(
         intArrayOf(-1, -1, -1, -1, -1, 1, 3, 3, 3, 3, -1, -1, -1, -1, 1, 7, 7, 7, 7, 1, -1, -1, -1, -1, -1),
         intArrayOf(-1, -1, -1, -1, -1, -1, 1, -1, 1, -1, 7, 1, 7, 1, 3, 1, -1, 1, -1, 1, -1, -1, -1, -1, -1)
     )
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Arrow-Align solver",
-                "Shows clicks needed for Arrow Align in F7/M7",
-                "Floor 7",
-                ConfigElement(
-                    "arrowAlignSolver",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Block wrong clicks",
-                ConfigElement(
-                    "arrowAlignSolver.blockWrong",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Only block when",
-                ConfigElement(
-                    "arrowAlignSolver.blockWrongType",
-                    ElementType.Dropdown(
-                        listOf("Always", "When crouching", "Not crouching"),
-                        0
-                    )
-                )
-            )
-    }
 
     override fun initialize() {
         register<TickEvent.Client> {

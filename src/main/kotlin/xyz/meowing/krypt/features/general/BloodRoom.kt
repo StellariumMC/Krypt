@@ -16,8 +16,6 @@ import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.enums.DungeonClass
 import xyz.meowing.krypt.api.dungeons.enums.map.RoomType
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.ChatEvent
 import xyz.meowing.krypt.events.core.EntityEvent
 import xyz.meowing.krypt.events.core.LocationEvent
@@ -25,12 +23,9 @@ import xyz.meowing.krypt.events.core.PacketEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.TitleUtils.showTitle
 import xyz.meowing.krypt.utils.modMessage
 import xyz.meowing.krypt.utils.rendering.Render3D
-import java.awt.Color
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -40,6 +35,9 @@ import java.util.concurrent.ConcurrentHashMap
 @Module
 object BloodRoom : Feature(
     "bloodRoom",
+    "Blood room helper",
+    "Shows where blood mobs will spawn and tracks timing",
+    "General",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private val firstSpawnRegex = Regex("^\\[BOSS] The Watcher: Let's see how you can handle this\\.$")
@@ -77,99 +75,16 @@ object BloodRoom : Feature(
     private var bloodOpen = false
     private var startTime = 0L
 
-    private val mageOnly by ConfigDelegate<Boolean>("bloodRoom.mageOnly")
-    private val showTimerDisplay by ConfigDelegate<Boolean>("bloodRoom.showTimerDisplay")
-    private val showBox by ConfigDelegate<Boolean>("bloodRoom.showBox")
-    private val showLine by ConfigDelegate<Boolean>("bloodRoom.showLine")
-    private val boxColor by ConfigDelegate<Color>("bloodRoom.boxColor")
-    private val lineColor by ConfigDelegate<Color>("bloodRoom.lineColor")
-    private val boxSize by ConfigDelegate<Double>("bloodRoom.boxSize")
-    private val tickValue by ConfigDelegate<Double>("bloodRoom.tick")
-    private val offset by ConfigDelegate<Double>("bloodRoom.offset")
-    private val showChatTimers by ConfigDelegate<Boolean>("bloodRoom.showChatTimers")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Blood room helper",
-                "Shows where blood mobs will spawn and tracks timing",
-                "General",
-                ConfigElement(
-                    "bloodRoom",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Show timer display",
-                ConfigElement(
-                    "bloodRoom.showTimerDisplay",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Show box",
-                ConfigElement(
-                    "bloodRoom.showBox",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Box color",
-                ConfigElement(
-                    "bloodRoom.boxColor",
-                    ElementType.ColorPicker(Color(255, 0, 255, 127))
-                )
-            )
-            .addFeatureOption(
-                "Show line",
-                ConfigElement(
-                    "bloodRoom.showLine",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Line color",
-                ConfigElement(
-                    "bloodRoom.lineColor",
-                    ElementType.ColorPicker(Color(0, 255, 255, 255))
-                )
-            )
-            .addFeatureOption(
-                "Box size",
-                ConfigElement(
-                    "bloodRoom.boxSize",
-                    ElementType.Slider(0.1, 1.0, 1.0, true)
-                )
-            )
-            .addFeatureOption(
-                "Box offset",
-                ConfigElement(
-                    "bloodRoom.offset",
-                    ElementType.Slider(-100.0, 100.0, 40.0, false)
-                )
-            )
-            .addFeatureOption(
-                "Tick offset",
-                ConfigElement(
-                    "bloodRoom.tick",
-                    ElementType.Slider(35.0, 41.0, 38.0, false)
-                )
-            )
-            .addFeatureOption(
-                "Mage only",
-                ConfigElement(
-                    "bloodRoom.mageOnly",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Show chat timers",
-                ConfigElement(
-                    "bloodRoom.showChatTimers",
-                    ElementType.Switch(true)
-                )
-            )
-    }
+    private val mageOnly by config.switch("Mage only")
+    private val showTimerDisplay by config.switch("Show timer", true)
+    private val showBox by config.switch("Show box", true)
+    private val showLine by config.switch("Show line")
+    private val boxColor by config.colorPicker("Box color")
+    private val lineColor by config.colorPicker("Line color")
+    private val boxSize by config.slider("Box size", 1.0, 0.1, 1.0)
+    private val tickValue by config.slider("Tick offset", 38.0, 35.0, 41.0, false)
+    private val offset by config.slider("Box offset", 40.0, -100.0, 100.0, false)
+    private val showChatTimers by config.switch("Show chat timers", true)
 
     override fun initialize() {
         register<LocationEvent.WorldChange> {

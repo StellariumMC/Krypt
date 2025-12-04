@@ -1,6 +1,6 @@
 package xyz.meowing.krypt.api.dungeons.enums.map
 
-import xyz.meowing.krypt.features.map.render.MapRenderConfig
+import xyz.meowing.krypt.features.map.DungeonMap
 import java.awt.Color
 
 enum class RoomType {
@@ -16,13 +16,13 @@ enum class RoomType {
 
     val color: Color
         get() = when (this) {
-            NORMAL -> MapRenderConfig.normalRoomColor
-            PUZZLE -> MapRenderConfig.puzzleRoomColor
-            TRAP -> MapRenderConfig.trapRoomColor
-            YELLOW -> MapRenderConfig.yellowRoomColor
-            BLOOD -> MapRenderConfig.bloodRoomColor
-            FAIRY -> MapRenderConfig.fairyRoomColor
-            ENTRANCE -> MapRenderConfig.entranceRoomColor
+            NORMAL -> DungeonMap.normalRoomColor
+            PUZZLE -> DungeonMap.puzzleRoomColor
+            TRAP -> DungeonMap.trapRoomColor
+            YELLOW -> DungeonMap.yellowRoomColor
+            BLOOD -> DungeonMap.bloodRoomColor
+            FAIRY -> DungeonMap.fairyRoomColor
+            ENTRANCE -> DungeonMap.entranceRoomColor
             UNKNOWN -> Color.GRAY
         }
 

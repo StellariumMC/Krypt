@@ -14,8 +14,6 @@ import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.enums.DungeonFloor
 import xyz.meowing.krypt.api.dungeons.enums.DungeonPhase
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.ChatEvent
 import xyz.meowing.krypt.events.core.EntityEvent
 import xyz.meowing.krypt.events.core.LocationEvent
@@ -24,8 +22,6 @@ import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.events.core.WorldEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.TitleUtils
 import xyz.meowing.krypt.utils.modMessage
 import xyz.meowing.krypt.utils.rendering.Render3D
@@ -34,71 +30,23 @@ import java.awt.Color
 @Module
 object SimonSaysSolver : Feature(
     "simonSaysSolver",
+    "Simons-Says solver",
+    "Tracks the solution for Simon-Says in F7/M7",
+    "Floor 7",
     dungeonFloor = listOf(DungeonFloor.F7, DungeonFloor.M7)
 ) {
     private val sequence = mutableListOf<BlockPos>()
     private val startPos = BlockPos(110, 121, 91)
     private var currentStep = 0
 
-    private val blockWrong by ConfigDelegate<Boolean>("simonSaysSolver.blockWrong")
-    private val blockWrongType by ConfigDelegate<Int>("simonSaysSolver.blockWrongType")
-    private val firstColor by ConfigDelegate<Color>("simonSaysSolver.firstColor")
-    private val secondColor by ConfigDelegate<Color>("simonSaysSolver.secondColor")
-    private val thirdColor by ConfigDelegate<Color>("simonSaysSolver.thirdColor")
+    private val blockWrong by config.switch("Block wrong clicks")
+    private val blockWrongType by config.dropdown("Block when", listOf("Always", "When crouching", "Not crouching"))
+    private val firstColor by config.colorPicker("First color", Color(0, 255, 0, 127))
+    private val secondColor by config.colorPicker("Second color",Color(255, 255, 0, 127) )
+    private val thirdColor by config.colorPicker("Third color", Color(255, 165, 0, 127))
 
     private var ticks = -1
     private var canBreak = false
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Simons-Says solver",
-                "Tracks the solution for Simon-Says in F7/M7",
-                "Floor 7",
-                ConfigElement(
-                    "simonSaysSolver",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Block wrong clicks",
-                ConfigElement(
-                    "simonSaysSolver.blockWrong",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Only block when",
-                ConfigElement(
-                    "simonSaysSolver.blockWrongType",
-                    ElementType.Dropdown(
-                        listOf("Always", "When crouching", "Not crouching"),
-                        0
-                    )
-                )
-            )
-            .addFeatureOption(
-                "First color",
-                ConfigElement(
-                    "simonSaysSolver.firstColor",
-                    ElementType.ColorPicker(Color(0, 255, 0, 127))
-                )
-            )
-            .addFeatureOption(
-                "Second color",
-                ConfigElement(
-                    "simonSaysSolver.secondColor",
-                    ElementType.ColorPicker(Color(255, 255, 0, 127))
-                )
-            )
-            .addFeatureOption(
-                "Third color",
-                ConfigElement(
-                    "simonSaysSolver.thirdColor",
-                    ElementType.ColorPicker(Color(255, 165, 0, 127))
-                )
-            )
-    }
 
     override fun initialize() {
         register<LocationEvent.WorldChange> {

@@ -8,8 +8,6 @@ import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.utils.ScanUtils.rotateBlock
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.ChatEvent
 import xyz.meowing.krypt.events.core.DungeonEvent
 import xyz.meowing.krypt.events.core.LocationEvent
@@ -17,8 +15,6 @@ import xyz.meowing.krypt.events.core.PacketEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.features.solvers.data.PuzzleTimer
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render3D
 import java.awt.Color
 import java.util.concurrent.ConcurrentHashMap
@@ -31,6 +27,9 @@ import java.util.concurrent.ConcurrentHashMap
 @Module
 object ThreeWeirdosSolver : Feature(
     "weirdosSolver",
+    "Three weirdos solver",
+    "Highlights the correct chest and removes wrong ones",
+    "Solvers",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private val npcRegex = Regex("\\[NPC] (\\w+): (.+)")
@@ -43,43 +42,9 @@ object ThreeWeirdosSolver : Feature(
     private var trueTimeStarted: Long? = null
     private var timeStarted: Long? = null
 
-    private val correctChestColor by ConfigDelegate<Color>("weirdosSolver.correctColor")
-    private val wrongChestColor by ConfigDelegate<Color>("weirdosSolver.wrongColor")
-    private val highlightWrongChests by ConfigDelegate<Boolean>("weirdosSolver.highlightWrongChests")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Three weirdos solver",
-                "Highlights the correct chest and removes wrong ones",
-                "Solvers",
-                ConfigElement(
-                    "weirdosSolver",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Correct chest color",
-                ConfigElement(
-                    "weirdosSolver.correctColor",
-                    ElementType.ColorPicker(Color(0, 255, 0, 127))
-                )
-            )
-            .addFeatureOption(
-                "Wrong chest color",
-                ConfigElement(
-                    "weirdosSolver.wrongColor",
-                    ElementType.ColorPicker(Color(255, 0, 0, 127))
-                )
-            )
-            .addFeatureOption(
-                "Highlight wrong chests",
-                ConfigElement(
-                    "weirdosSolver.highlightWrongChests",
-                    ElementType.Switch(true)
-                )
-            )
-    }
+    private val correctColor by config.colorPicker("Correct chest color", Color(0, 255, 0, 127))
+    private val wrongColor by config.colorPicker("Wrong chest color", Color(255, 0, 0, 127))
+    private val highlightWrongChests by config.switch("Highlight wrong chests", true)
 
     override fun initialize() {
         register<DungeonEvent.Room.Change> { event ->
@@ -102,7 +67,7 @@ object ThreeWeirdosSolver : Feature(
             correctPos?.let { chest ->
                 Render3D.drawSpecialBB(
                     chest,
-                    correctChestColor,
+                    correctColor,
                     event.context.consumers(),
                     event.context.matrixStack(),
                     phase = false
@@ -113,7 +78,7 @@ object ThreeWeirdosSolver : Feature(
                 wrongPositions.forEach { pos ->
                     Render3D.drawSpecialBB(
                         pos,
-                        wrongChestColor,
+                        wrongColor,
                         event.context.consumers(),
                         event.context.matrixStack(),
                         phase = false

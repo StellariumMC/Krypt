@@ -8,17 +8,16 @@ import net.minecraft.world.entity.item.ItemEntity
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitPlayer.player
-import xyz.meowing.krypt.config.ConfigDelegate
 import xyz.meowing.krypt.events.core.DungeonEvent
 
 @Module
 object SecretSound : Feature(
     "secretSound",
+    "Secret sound",
+    "Sounds when you interact with a secret",
+    "General",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private const val SECRET_DISTANCE = 10.0
@@ -36,46 +35,12 @@ object SecretSound : Feature(
 
     private val dropdownValues = SoundTypes.entries.map { it.getName() }.toList()
 
-    private val volume by ConfigDelegate<Double>("secretSound.volume")
-    private val soundIndex by ConfigDelegate<Int>("secretSound.sound")
-    private val pitch by ConfigDelegate<Double>("secretSound.pitch")
+    private val volume by config.slider("Volume", 100.0, 0.0, 100.0, false)
+    private val pitch by config.slider("Pitch", 100.0, 0.0, 100.0, false)
+    private val soundIndex by config.dropdown("Sound", dropdownValues)
 
     private val selectedSound: SoundEvent
         get() = SoundTypes.entries[soundIndex].getSound()
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Secret sound",
-                "Secret sound",
-                "General",
-                ConfigElement(
-                    "secretSound",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Volume",
-                ConfigElement(
-                    "secretSound.volume",
-                    ElementType.Slider(0.0, 100.0, 100.0, false)
-                )
-            )
-            .addFeatureOption(
-                "Pitch",
-                ConfigElement(
-                    "secretSound.pitch",
-                    ElementType.Slider(0.0, 100.0, 100.0, false)
-                )
-            )
-            .addFeatureOption(
-                "Sound",
-                ConfigElement(
-                    "secretSound.sound",
-                    ElementType.Dropdown(dropdownValues, 0)
-                )
-            )
-    }
 
     override fun initialize() {
         register<DungeonEvent.Secrets.Chest> { playSound() }

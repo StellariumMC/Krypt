@@ -8,16 +8,12 @@ import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.utils.ScanUtils
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.DungeonEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.PacketEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.features.solvers.data.PuzzleTimer
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render3D
 import java.awt.Color
 import kotlin.math.abs
@@ -34,6 +30,9 @@ import kotlin.math.sqrt
 @Module
 object TeleportMazeSolver : Feature(
     "tpMazeSolver",
+    "Teleport maze solver",
+    "Highlights correct teleport pads in order",
+    "Solvers",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private class TpPad(
@@ -58,35 +57,8 @@ object TeleportMazeSolver : Feature(
     private var trueTimeStarted: Long? = null
     private var timeStarted: Long? = null
 
-    private val correctPadColor by ConfigDelegate<Color>("tpMazeSolver.correctColor")
-    private val wrongPadColor by ConfigDelegate<Color>("tpMazeSolver.wrongColor")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Teleport maze solver",
-                "Highlights correct teleport pads in order",
-                "Solvers",
-                ConfigElement(
-                    "tpMazeSolver",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Correct pad color",
-                ConfigElement(
-                    "tpMazeSolver.correctColor",
-                    ElementType.ColorPicker(Color(0, 255, 0, 127))
-                )
-            )
-            .addFeatureOption(
-                "Wrong pad color",
-                ConfigElement(
-                    "tpMazeSolver.wrongColor",
-                    ElementType.ColorPicker(Color(255, 0, 0, 127))
-                )
-            )
-    }
+    private val correctColor by config.colorPicker("Correct pad color", Color(0, 255, 0, 127))
+    private val wrongColor by config.colorPicker("Wrong pad color", Color(255, 0, 0, 127))
 
     override fun initialize() {
         register<DungeonEvent.Room.Change> { event ->
@@ -139,7 +111,7 @@ object TeleportMazeSolver : Feature(
 
             Render3D.drawSpecialBB(
                 top[0].pos,
-                correctPadColor,
+                correctColor,
                 event.context.consumers(),
                 event.context.matrixStack(),
                 phase = true
@@ -149,7 +121,7 @@ object TeleportMazeSolver : Feature(
                 cell.pads.filter { it.blacklisted }.forEach { pad ->
                     Render3D.drawSpecialBB(
                         pad.pos,
-                        wrongPadColor,
+                        wrongColor,
                         event.context.consumers(),
                         event.context.matrixStack(),
                         phase = false

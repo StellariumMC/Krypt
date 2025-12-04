@@ -8,51 +8,26 @@ import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.enums.DungeonClass
 import xyz.meowing.krypt.api.dungeons.enums.DungeonFloor
 import xyz.meowing.krypt.api.dungeons.enums.DungeonPhase
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render3D
 import java.awt.Color
 
 @Module
 object TerminalWaypoints : Feature(
-    "terminalWaypoints",
+    configKey = "terminalWaypoints",
+    configName = "Terminal waypoints",
+    configDescription = "Shows terminal and lever locations in F7/M7",
+    configCategory = "Floor 7",
     dungeonFloor = listOf(DungeonFloor.F7, DungeonFloor.M7)
 ) {
-    private val checkClass by ConfigDelegate<Boolean>("terminalWaypoints.focusMode")
-    private val showText by ConfigDelegate<Boolean>("terminalWaypoints.renderText")
-    private val highlightStyle by ConfigDelegate<Int>("terminalWaypoints.highlightStyle")
-    private val terminalColor by ConfigDelegate<Color>("terminalWaypoints.terminalColor")
-    private val leverColor by ConfigDelegate<Color>("terminalWaypoints.leverColor")
-
-    private val terminal1Class by ConfigDelegate<Int>("terminalWaypoints.terminal1Class")
-    private val terminal2Class by ConfigDelegate<Int>("terminalWaypoints.terminal2Class")
-    private val terminal3Class by ConfigDelegate<Int>("terminalWaypoints.terminal3Class")
-    private val terminal4Class by ConfigDelegate<Int>("terminalWaypoints.terminal4Class")
-    private val terminal5Class by ConfigDelegate<Int>("terminalWaypoints.terminal5Class")
-    private val terminal6Class by ConfigDelegate<Int>("terminalWaypoints.terminal6Class")
-    private val terminal7Class by ConfigDelegate<Int>("terminalWaypoints.terminal7Class")
-    private val terminal8Class by ConfigDelegate<Int>("terminalWaypoints.terminal8Class")
-    private val terminal9Class by ConfigDelegate<Int>("terminalWaypoints.terminal9Class")
-    private val terminal10Class by ConfigDelegate<Int>("terminalWaypoints.terminal10Class")
-    private val terminal11Class by ConfigDelegate<Int>("terminalWaypoints.terminal11Class")
-    private val terminal12Class by ConfigDelegate<Int>("terminalWaypoints.terminal12Class")
-    private val terminal13Class by ConfigDelegate<Int>("terminalWaypoints.terminal13Class")
-    private val terminal14Class by ConfigDelegate<Int>("terminalWaypoints.terminal14Class")
-    private val terminal15Class by ConfigDelegate<Int>("terminalWaypoints.terminal15Class")
-    private val terminal16Class by ConfigDelegate<Int>("terminalWaypoints.terminal16Class")
-    private val terminal17Class by ConfigDelegate<Int>("terminalWaypoints.terminal17Class")
-    private val terminal18Class by ConfigDelegate<Int>("terminalWaypoints.terminal18Class")
-    private val terminal19Class by ConfigDelegate<Int>("terminalWaypoints.terminal19Class")
-    private val terminal20Class by ConfigDelegate<Int>("terminalWaypoints.terminal20Class")
-    private val terminal21Class by ConfigDelegate<Int>("terminalWaypoints.terminal21Class")
-    private val terminal22Class by ConfigDelegate<Int>("terminalWaypoints.terminal22Class")
-    private val terminal23Class by ConfigDelegate<Int>("terminalWaypoints.terminal23Class")
-    private val terminal24Class by ConfigDelegate<Int>("terminalWaypoints.terminal24Class")
-    private val terminal25Class by ConfigDelegate<Int>("terminalWaypoints.terminal25Class")
+    private val classOptions = listOf(
+        "Healer",
+        "Mage",
+        "Berserk",
+        "Archer",
+        "Tank"
+    )
 
     private data class Terminal(
         val positions: List<BlockPos>,
@@ -62,14 +37,6 @@ object TerminalWaypoints : Feature(
         val section: DungeonPhase.P3
     )
 
-    private val classOptions = listOf(
-        "Healer",
-        "Mage",
-        "Berserk",
-        "Archer",
-        "Tank"
-    )
-
     private val classMapping = mapOf(
         0 to DungeonClass.HEALER,
         1 to DungeonClass.MAGE,
@@ -77,6 +44,41 @@ object TerminalWaypoints : Feature(
         3 to DungeonClass.ARCHER,
         4 to DungeonClass.TANK
     )
+
+    private val checkClass by config.switch("Check dungeon class")
+    private val showText by config.switch("Render text", true)
+    private val highlightStyle by config.dropdown("Highlight style", listOf("Outline", "Filled", "Both"), 0)
+    private val terminalColor by config.colorPicker("Terminal color", Color(0, 255, 255, 200))
+    private val leverColor by config.colorPicker("Lever color", Color(255, 255, 0, 200))
+
+    private val terminal1Class by config.dropdown("S1 Terminal 1 class", classOptions, 4)
+    private val terminal2Class by config.dropdown("S1 Terminal 2 class", classOptions, 4)
+    private val terminal3Class by config.dropdown("S1 Terminal 3 class", classOptions, 1)
+    private val terminal4Class by config.dropdown("S1 Terminal 4 class", classOptions, 1)
+    private val terminal5Class by config.dropdown("S1 Right Lever class", classOptions, 3)
+    private val terminal6Class by config.dropdown("S1 Left Lever class", classOptions, 3)
+
+    private val terminal7Class by config.dropdown("S2 Terminal 1 class", classOptions, 4)
+    private val terminal8Class by config.dropdown("S2 Terminal 2 class", classOptions, 1)
+    private val terminal9Class by config.dropdown("S2 Terminal 3 class", classOptions, 2)
+    private val terminal10Class by config.dropdown("S2 Terminal 4 class", classOptions, 3)
+    private val terminal11Class by config.dropdown("S2 Terminal 5 class", classOptions, 2)
+    private val terminal12Class by config.dropdown("S2 Right Lever class", classOptions, 3)
+    private val terminal13Class by config.dropdown("S2 Left Lever class", classOptions, 0)
+
+    private val terminal14Class by config.dropdown("S3 Terminal 1 class", classOptions, 4)
+    private val terminal15Class by config.dropdown("S3 Terminal 2 class", classOptions, 0)
+    private val terminal16Class by config.dropdown("S3 Terminal 3 class", classOptions, 2)
+    private val terminal17Class by config.dropdown("S3 Terminal 4 class", classOptions, 3)
+    private val terminal18Class by config.dropdown("S3 Right Lever class", classOptions, 3)
+    private val terminal19Class by config.dropdown("S3 Left Lever class", classOptions, 3)
+
+    private val terminal20Class by config.dropdown("S4 Terminal 1 class", classOptions, 4)
+    private val terminal21Class by config.dropdown("S4 Terminal 2 class", classOptions, 3)
+    private val terminal22Class by config.dropdown("S4 Terminal 3 class", classOptions, 2)
+    private val terminal23Class by config.dropdown("S4 Terminal 4 class", classOptions, 0)
+    private val terminal24Class by config.dropdown("S4 Right Lever class", classOptions, 0)
+    private val terminal25Class by config.dropdown("S4 Left Lever class", classOptions, 0)
 
     private val terminals = listOf(
         Terminal(listOf(BlockPos(111, 113, 73), BlockPos(110, 113, 73)), false, DungeonClass.TANK, 1, DungeonPhase.P3.S1),
@@ -108,92 +110,6 @@ object TerminalWaypoints : Feature(
         Terminal(listOf(BlockPos(86, 128, 46), BlockPos(86, 129, 46)), true, DungeonClass.HEALER, 24, DungeonPhase.P3.S4),
         Terminal(listOf(BlockPos(84, 121, 34), BlockPos(84, 122, 34)), true, DungeonClass.HEALER, 25, DungeonPhase.P3.S4)
     )
-
-    override fun addConfig() {
-        val feature = ConfigManager
-            .addFeature(
-                "Terminal waypoints",
-                "Shows terminal and lever locations in F7/M7",
-                "Floor 7",
-                ConfigElement(
-                    "terminalWaypoints",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Check dungeon class",
-                ConfigElement(
-                    "terminalWaypoints.focusMode",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Render text",
-                ConfigElement(
-                    "terminalWaypoints.renderText",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Highlight style",
-                ConfigElement(
-                    "terminalWaypoints.highlightStyle",
-                    ElementType.Dropdown(
-                        listOf("Outline", "Filled", "Both"),
-                        0
-                    )
-                )
-            )
-            .addFeatureOption(
-                "Terminal color",
-                ConfigElement(
-                    "terminalWaypoints.terminalColor",
-                    ElementType.ColorPicker(Color(0, 255, 255, 200))
-                )
-            )
-            .addFeatureOption(
-                "Lever color",
-                ConfigElement(
-                    "terminalWaypoints.leverColor",
-                    ElementType.ColorPicker(Color(255, 255, 0, 200))
-                )
-            )
-
-        terminals.forEachIndexed { index, terminal ->
-            val defaultIndex = classOptions.indexOf(terminal.defaultClass.displayName)
-
-            val indexInSection = when (terminal.section.number) {
-                1 -> index
-                2 -> index - 6
-                3 -> index - 13
-                else -> index - 19
-            }
-
-            val sectionTerminals = when (terminal.section.number) {
-                1 -> terminals.subList(0, 6)
-                2 -> terminals.subList(6, 13)
-                3 -> terminals.subList(13, 19)
-                else -> terminals.subList(19, 25)
-            }
-
-            val name = if (terminal.isLever) {
-                val leversInSection = sectionTerminals.filter { it.isLever }
-                val leverIndex = leversInSection.indexOf(terminal)
-                if (leverIndex == 0) "Right Lever" else "Left Lever"
-            } else {
-                val terminalIndex = sectionTerminals.take(indexInSection + 1).count { !it.isLever }
-                "Terminal $terminalIndex"
-            }
-
-            feature.addFeatureOption(
-                "S${terminal.section.number} $name class",
-                ConfigElement(
-                    "terminalWaypoints.terminal${index + 1}Class",
-                    ElementType.Dropdown(classOptions, defaultIndex)
-                )
-            )
-        }
-    }
 
     override fun initialize() {
         register<RenderEvent.World.Last> { event ->

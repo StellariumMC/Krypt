@@ -5,42 +5,21 @@ import net.minecraft.world.phys.AABB
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.enums.map.Room
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.DungeonEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render3D
 import java.awt.Color
 
 @Module
 object ClickedSecretsBox : Feature(
     "secretBox",
+    "Clicked secret boxes",
+    "Draw a box on clicked secrets",
+    "General",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Clicked secret boxes",
-                "Draw a box on clicked secrets",
-                "General",
-                ConfigElement(
-                    "secretBox",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Box color",
-                ConfigElement(
-                    "secretBox.color",
-                    ElementType.ColorPicker(Color.red)
-                )
-            )
-    }
-
-    private val color by ConfigDelegate<Color>("secretBox.color")
+    private val color by config.colorPicker("Box color", Color.red)
     private var clickedSecrets: MutableList<BlockPos> = mutableListOf()
     private val roomMap: MutableMap<Room, MutableList<BlockPos>> = mutableMapOf()
 

@@ -14,22 +14,21 @@ import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.GuiEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.PacketEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.hud.HUDManager
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render2D
 import java.awt.Color
 
 @Module
 object BreakerChargeDisplay : Feature(
     "breakerChargeDisplay",
+    "Breaker charge display",
+    "Displays the charges left and the max charges on your dungeon breaker.",
+    "General",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private const val NAME = "Breaker Charge Display"
@@ -37,59 +36,11 @@ object BreakerChargeDisplay : Feature(
     private var renderString = ""
     private var charges = 0
 
-    private val compact by ConfigDelegate<Boolean>("breakerChargeDisplay.compact")
-    private val renderText by ConfigDelegate<Boolean>("breakerChargeDisplay.renderText")
-    private val outlineBlocks by ConfigDelegate<Boolean>("breakerChargeDisplay.outlineBlocks")
-    private val emptyColor by ConfigDelegate<Color>("breakerChargeDisplay.noChargesColor")
-    private val fullColor by ConfigDelegate<Color>("breakerChargeDisplay.allChargesColor")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Breaker charge display",
-                "Displays the charges left and the max charges on your dungeon breaker.",
-                "General",
-                ConfigElement(
-                    "breakerChargeDisplay",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Render text",
-                ConfigElement(
-                    "breakerChargeDisplay.renderText",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Compact display",
-                ConfigElement(
-                    "breakerChargeDisplay.compact",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Outline blocks",
-                ConfigElement(
-                    "breakerChargeDisplay.outlineBlocks",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "No charges color",
-                ConfigElement(
-                    "breakerChargeDisplay.noChargesColor",
-                    ElementType.ColorPicker(Color(255, 0, 0, 255))
-                )
-            )
-            .addFeatureOption(
-                "All charges color",
-                ConfigElement(
-                    "breakerChargeDisplay.allChargesColor",
-                    ElementType.ColorPicker(Color(0, 255, 0, 255))
-                )
-            )
-    }
+    private val renderText by config.switch("Render text")
+    private val compact by config.switch("Compact display", true)
+    private val outlineBlocks by config.switch("Outline blocks", true)
+    private val noChargesColor by config.colorPicker("No charges color", Color(255, 0, 0, 255))
+    private val allChargesColor by config.colorPicker("All charges color", Color(0, 255, 0, 255))
 
     override fun initialize() {
         HUDManager.register(NAME, "§c⸕§e20", "breakerChargeDisplay.renderText")
@@ -143,7 +94,7 @@ object BreakerChargeDisplay : Feature(
             val camPos = camera.position
             event.cancel()
 
-            val color = if (charges == 0) emptyColor else fullColor
+            val color = if (charges == 0) noChargesColor else allChargesColor
 
             ShapeRenderer.renderShape(
                 matrixStack,

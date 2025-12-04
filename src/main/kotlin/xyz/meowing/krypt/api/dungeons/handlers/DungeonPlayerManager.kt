@@ -10,6 +10,7 @@ import xyz.meowing.krypt.api.dungeons.handlers.ScoreCalculator.deathCount
 import xyz.meowing.krypt.api.location.SkyBlockIsland
 import xyz.meowing.krypt.events.EventBus
 import xyz.meowing.krypt.events.core.ChatEvent
+import xyz.meowing.krypt.events.core.DungeonEvent
 import xyz.meowing.krypt.events.core.TablistEvent
 import kotlin.text.get
 
@@ -74,6 +75,8 @@ object DungeonPlayerManager {
         player.dead = true
         player.deaths++
         deathCount++
+
+        EventBus.post(DungeonEvent.Player.Death(player))
     }
 
     fun getPlayer(name: String): DungeonPlayer? {

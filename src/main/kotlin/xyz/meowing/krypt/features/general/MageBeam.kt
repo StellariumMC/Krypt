@@ -5,14 +5,10 @@ import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.phys.Vec3
 import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.krypt.annotations.Module
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.PacketEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render3D
 import xyz.meowing.krypt.api.location.SkyBlockIsland
 import xyz.meowing.krypt.events.core.LocationEvent
@@ -25,6 +21,9 @@ import java.util.concurrent.CopyOnWriteArrayList
 @Module
 object MageBeam : Feature(
     "mageBeam",
+    "Mage beam",
+    "Customizes the rendering of the mage beam ability",
+    "General",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private data class BeamData(
@@ -36,59 +35,11 @@ object MageBeam : Feature(
     private val activeBeams = CopyOnWriteArrayList<BeamData>()
     private var currentTick = 0
 
-    private val customBeamEnabled by ConfigDelegate<Boolean>("mageBeam.customBeamEnabled")
-    private val duration by ConfigDelegate<Double>("mageBeam.duration")
-    private val color by ConfigDelegate<Color>("mageBeam.color")
-    private val hideParticles by ConfigDelegate<Boolean>("mageBeam.hideParticles")
-    private val minPoints by ConfigDelegate<Double>("mageBeam.minPoints")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Mage beam",
-                "Customizes the rendering of the mage beam ability",
-                "General",
-                ConfigElement(
-                    "mageBeam",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Custom beam",
-                ConfigElement(
-                    "mageBeam.customBeamEnabled",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Duration (ticks)",
-                ConfigElement(
-                    "mageBeam.duration",
-                    ElementType.Slider(10.0, 100.0, 40.0, false)
-                )
-            )
-            .addFeatureOption(
-                "Color",
-                ConfigElement(
-                    "mageBeam.color",
-                    ElementType.ColorPicker(Color(255, 100, 100, 255))
-                )
-            )
-            .addFeatureOption(
-                "Hide vanilla particles",
-                ConfigElement(
-                    "mageBeam.hideParticles",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Minimum points",
-                ConfigElement(
-                    "mageBeam.minPoints",
-                    ElementType.Slider(1.0, 20.0, 8.0, false)
-                )
-            )
-    }
+    private val customBeamEnabled by config.switch("Custom beam", true)
+    private val duration by config.slider("Duration (ticks)", 40.0, 10.0, 100.0, false)
+    private val color by config.colorPicker("Color", Color(255, 100, 100, 255))
+    private val hideParticles by config.switch("Hide particles", true)
+    private val minPoints by config.slider("Minimum points", 8.0, 1.0, 20.0, false)
 
     override fun initialize() {
         register<LocationEvent.WorldChange> {

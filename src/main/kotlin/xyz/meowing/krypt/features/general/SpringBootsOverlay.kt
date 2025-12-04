@@ -8,25 +8,23 @@ import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
 import xyz.meowing.knit.api.KnitClient.player
 import xyz.meowing.krypt.annotations.Module
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.GuiEvent
 import xyz.meowing.krypt.events.core.PacketEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.hud.HUDManager
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.Utils.equalsOneOf
 import xyz.meowing.krypt.utils.rendering.Render2D
 import xyz.meowing.krypt.utils.rendering.Render3D
-import java.awt.Color
 
 @Module
 object SpringBootsOverlay : Feature(
     "springBootsOverlay",
-    true
+    "Spring boots overlay",
+    "Shows the amount of blocks you can jump",
+    "General",
+    skyblockOnly = true
 ) {
     private const val NAME = "Spring Boots Overlay"
     private val pitchList = listOf(
@@ -51,43 +49,9 @@ object SpringBootsOverlay : Feature(
     private var progress = 0
     private var height = 0f
 
-    private val render3d by ConfigDelegate<Boolean>("springBootsOverlay.render3d")
-    private val color by ConfigDelegate<Color>("springBootsOverlay.color")
-    private val expansion by ConfigDelegate<Double>("springBootsOverlay.expansion")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Spring boots overlay",
-                "Shows the amount of blocks you can jump",
-                "General",
-                ConfigElement(
-                    "springBootsOverlay",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Render 3D box",
-                ConfigElement(
-                    "springBootsOverlay.render3d",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Color",
-                ConfigElement(
-                    "springBootsOverlay.color",
-                    ElementType.ColorPicker(Color(0, 255, 255, 127))
-                )
-            )
-            .addFeatureOption(
-                "Box expansion",
-                ConfigElement(
-                    "springBootsOverlay.expansion",
-                    ElementType.Slider(0.0, 5.0, 0.0, true)
-                )
-            )
-    }
+    private val color by config.colorPicker("Color")
+    private val render3d by config.switch("Render 3D box", true)
+    private val expansion by config.slider("Box expansion", 0.0, 5.0, 0.0, true)
 
     override fun initialize() {
         HUDManager.register(NAME, "§eHeight: §c44", "springBootsOverlay")

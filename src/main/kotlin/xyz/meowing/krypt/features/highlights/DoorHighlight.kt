@@ -5,7 +5,6 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.AABB
 import tech.thatgravyboat.skyblockapi.utils.regex.matchWhen
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
-import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
@@ -13,20 +12,19 @@ import xyz.meowing.krypt.api.dungeons.enums.DungeonKey
 import xyz.meowing.krypt.api.dungeons.enums.map.DoorState
 import xyz.meowing.krypt.api.dungeons.enums.map.DoorType
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.ChatEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render3D
 import java.awt.Color
 
 @Module
 object DoorHighlight : Feature(
     "doorHighlight",
+    "Door highlight",
+    "Highlight wither/blood doors through walls",
+    "Highlights",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private val keyObtainedRegex = Regex("(?:\\[.+] ?)?\\w+ has obtained (?<type>\\w+) Key!")
@@ -38,67 +36,12 @@ object DoorHighlight : Feature(
     private var bloodKeyObtained = false
     private var bloodOpen = false
 
-    private val filled by ConfigDelegate<Boolean>("doorHighlight.filled")
-    private val outlined by ConfigDelegate<Boolean>("doorHighlight.outlined")
-    private val witherWithKey by ConfigDelegate<Color>("doorHighlight.witherWithKey")
-    private val witherNoKey by ConfigDelegate<Color>("doorHighlight.witherNoKey")
-    private val bloodWithKey by ConfigDelegate<Color>("doorHighlight.bloodWithKey")
-    private val bloodNoKey by ConfigDelegate<Color>("doorHighlight.bloodNoKey")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Door highlight",
-                "Highlight wither/blood doors through walls",
-                "Highlights",
-                ConfigElement(
-                    "doorHighlight",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Filled box",
-                ConfigElement(
-                    "doorHighlight.filled",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Outlined box",
-                ConfigElement(
-                    "doorHighlight.outlined",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Wither door with key",
-                ConfigElement(
-                    "doorHighlight.witherWithKey",
-                    ElementType.ColorPicker(Color(0, 255, 0, 255))
-                )
-            )
-            .addFeatureOption(
-                "Wither door without key",
-                ConfigElement(
-                    "doorHighlight.witherNoKey",
-                    ElementType.ColorPicker(Color(255, 255, 255, 255))
-                )
-            )
-            .addFeatureOption(
-                "Blood door with key",
-                ConfigElement(
-                    "doorHighlight.bloodWithKey",
-                    ElementType.ColorPicker(Color(0, 255, 0, 255))
-                )
-            )
-            .addFeatureOption(
-                "Blood door without key",
-                ConfigElement(
-                    "doorHighlight.bloodNoKey",
-                    ElementType.ColorPicker(Color(255, 0, 0, 255))
-                )
-            )
-    }
+    private val filled by config.switch("Filled box")
+    private val outlined by config.switch("Outlined box", true)
+    private val witherWithKey by config.colorPicker("Wither door with key", Color(0, 255, 0, 255))
+    private val witherNoKey by config.colorPicker("Wither door without key", Color(255, 255, 255, 255))
+    private val bloodWithKey by config.colorPicker("Blood door with key", Color(0, 255, 0, 255))
+    private val bloodNoKey by config.colorPicker("Blood dor without key", Color(255, 0, 0, 255))
 
     override fun initialize() {
         register<LocationEvent.WorldChange> { reset() }

@@ -6,43 +6,19 @@ import xyz.meowing.knit.api.utils.NumberUtils.format
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.enums.DungeonFloor
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.Utils.equalsOneOf
 
 @Module
 object NecronHealthDisplay : Feature(
     "necronHealthDisplay",
+    "Necron health display",
+    "Shows boss health in F7/M7 for the withers",
+    "Floor 7",
     dungeonFloor = listOf(DungeonFloor.F7, DungeonFloor.M7)
 ) {
-    private val displayMode by ConfigDelegate<Int>("necronHealthDisplay.mode")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Necron health display",
-                "Shows boss health in F7/M7 for the withers",
-                "Floor 7",
-                ConfigElement(
-                    "necronHealthDisplay",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Display mode",
-                ConfigElement(
-                    "necronHealthDisplay.mode",
-                    ElementType.Dropdown(
-                        listOf("Numeric", "Percentage"),
-                        0
-                    )
-                )
-            )
-    }
+    private val displayMode by config.dropdown("Display mode", listOf("Numeric", "Percentage"))
 
     override fun initialize() {
         register<RenderEvent.BossBar> { event ->

@@ -8,29 +8,17 @@ import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.PacketEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 
 @Module
 object HideNonStarredTags : Feature(
     "hideNonStarredTags",
+    "Hide non-starred nametags",
+    "Hides non-starred mob's nametags in dungeons.",
+    "General",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
-    override fun addConfig() {
-        ConfigManager.addFeature(
-            "Hide non-starred nametags",
-            "Hides non-starred mob's nametags in dungeons.",
-            "General",
-            ConfigElement(
-                "hideNonStarredTags",
-                ElementType.Switch(false)
-            )
-        )
-    }
-
     override fun initialize() {
         register<PacketEvent.Received> { event ->
             val packet = event.packet as? ClientboundAddEntityPacket ?: return@register

@@ -4,47 +4,26 @@ import net.minecraft.client.gui.GuiGraphics
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.enums.DungeonFloor
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.ChatEvent
 import xyz.meowing.krypt.events.core.GuiEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.hud.HUDManager
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.TitleUtils.showTitle
 import xyz.meowing.krypt.utils.rendering.Render2D
 
 @Module
 object FireFreezeAlert : Feature(
     "fireFreezeAlert",
+    "Fire freeze alert",
+    "Shows an alert for Fire Freeze in F3/M3, along with an optional timer",
+    "Alerts",
     dungeonFloor = listOf(DungeonFloor.F3, DungeonFloor.M3)
 ) {
     private const val NAME = "Fire Freeze Timer"
     private var ticks = 0
 
-    private val timer by ConfigDelegate<Boolean>("fireFreezeAlert.timer")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Fire freeze alert",
-                "Shows an alert for Fire Freeze in F3/M3, along with an optional timer",
-                "Alerts",
-                ConfigElement(
-                    "fireFreezeAlert",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Show timer",
-                ConfigElement(
-                    "fireFreezeAlert.timer",
-                    ElementType.Switch(false)
-                )
-            )
-    }
+    private val timer by config.switch("Show timer")
 
     override fun initialize() {
         HUDManager.register(NAME, "§bFire freeze: §c4.3s", "fireFreezeTimer.timer")

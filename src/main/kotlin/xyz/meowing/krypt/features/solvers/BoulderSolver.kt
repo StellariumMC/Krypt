@@ -13,16 +13,12 @@ import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.utils.ScanUtils
 import xyz.meowing.krypt.api.dungeons.utils.ScanUtils.getRealCoord
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.DungeonEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.PacketEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.features.solvers.data.PuzzleTimer
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.NetworkUtils
 import xyz.meowing.krypt.utils.rendering.Render3D
 import java.awt.Color
@@ -35,6 +31,9 @@ import java.awt.Color
 @Module
 object BoulderSolver : Feature(
     "boulderSolver",
+    "Boulder solver",
+    "Shows which boulders to click in order",
+    "Solvers",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private data class BoulderBox(val box: BlockPos, val clickPos: BlockPos, val render: BlockPos)
@@ -50,9 +49,9 @@ object BoulderSolver : Feature(
     private var trueTimeStarted: Long? = null
     private var timeStarted: Long? = null
 
-    private val boxColor by ConfigDelegate<Color>("boulderSolver.boxColor")
-    private val clickColor by ConfigDelegate<Color>("boulderSolver.clickColor")
-    private val showAll by ConfigDelegate<Boolean>("boulderSolver.showAll")
+    private val boxColor by config.colorPicker("Box color", Color(255, 0, 0, 127))
+    private val clickColor by config.colorPicker("Click color", Color(0, 255, 0, 255))
+    private val showAll by config.switch("Show all boxes")
 
     init {
         NetworkUtils.fetchJson<Map<String, List<List<Double>>>>(
@@ -65,40 +64,6 @@ object BoulderSolver : Feature(
                 Krypt.LOGGER.error("Caught error while trying to load Boulder solutions: $error")
             }
         )
-    }
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Boulder solver",
-                "Shows which boulders to click in order",
-                "Solvers",
-                ConfigElement(
-                    "boulderSolver",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Box color",
-                ConfigElement(
-                    "boulderSolver.boxColor",
-                    ElementType.ColorPicker(Color(255, 0, 0, 127))
-                )
-            )
-            .addFeatureOption(
-                "Click color",
-                ConfigElement(
-                    "boulderSolver.clickColor",
-                    ElementType.ColorPicker(Color(0, 255, 0, 255))
-                )
-            )
-            .addFeatureOption(
-                "Show all boxes",
-                ConfigElement(
-                    "boulderSolver.showAll",
-                    ElementType.Switch(false)
-                )
-            )
     }
 
     override fun initialize() {

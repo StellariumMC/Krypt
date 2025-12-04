@@ -10,13 +10,9 @@ import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.ItemTooltipEvent
 import xyz.meowing.krypt.events.core.ChatEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.NetworkUtils
 import xyz.meowing.krypt.utils.Utils.toLegacyString
 import xyz.meowing.knit.api.KnitChat
@@ -31,20 +27,23 @@ import java.util.concurrent.ConcurrentHashMap
 @Module
 object BetterPartyFinder : Feature(
     "betterPartyFinder",
+    "Better party finder",
+    "Better party finder tooltips with player stats",
+    "General",
     island = SkyBlockIsland.DUNGEON_HUB
 ) {
-    private val showCataLevel by ConfigDelegate<Boolean>("betterPartyFinder.cataLevel")
-    private val showSecrets by ConfigDelegate<Boolean>("betterPartyFinder.secrets")
-    private val showSecretAverage by ConfigDelegate<Boolean>("betterPartyFinder.secretAverage")
-    private val showPB by ConfigDelegate<Boolean>("betterPartyFinder.pb")
-    private val showMissingClasses by ConfigDelegate<Boolean>("betterPartyFinder.missingClasses")
+    private val showCataLevel by config.switch("Show cata level", true)
+    private val showSecrets by config.switch("Show secrets", true)
+    private val showSecretAverage by config.switch("Show secret average", true)
+    private val showPB by config.switch("Show PB", true)
+    private val showMissingClasses by config.switch("Show missing classes", true)
 
-    private val autoKick by ConfigDelegate<Boolean>("betterPartyFinder.autoKick")
-    private val shitterList by ConfigDelegate<Boolean>("betterPartyFinder.shitterList")
-    private val selectedFloor by ConfigDelegate<Int>("betterPartyFinder.selectedFloor")
-    private val requiredPB by ConfigDelegate<String>("betterPartyFinder.requiredPB")
-    private val requiredSecrets by ConfigDelegate<String>("betterPartyFinder.requiredSecrets")
-    private val kickMessage by ConfigDelegate<Boolean>("betterPartyFinder.kickMessage")
+    private val autoKick by config.switch("Auto kick")
+    private val shitterList by config.switch("Shitter list")
+    private val selectedFloor by config.dropdown("Selected floor", listOf("F7", "M4", "M5", "M6", "M7"))
+    private val requiredPB by config.textInput("Required PB")
+    private val requiredSecrets by config.textInput("Required secrets")
+    private val kickMessage by config.switch("Show kick message", true)
 
     private val playerCache = ConcurrentHashMap<String, PlayerData>()
     private val uuidCache = ConcurrentHashMap<String, String>()
@@ -66,103 +65,13 @@ object BetterPartyFinder : Feature(
     private val gson = Gson()
 
     private val kickListJson = StoredFile("features/KickList")
-    var config by kickListJson.jsonObject("players")
+    var jsonObject by kickListJson.jsonObject("players")
     val kickList: MutableList<String> = mutableListOf()
 
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Better party finder",
-                "Better party finder tooltips with player stats",
-                "General",
-                ConfigElement(
-                    "betterPartyFinder",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Show cata level",
-                ConfigElement(
-                    "betterPartyFinder.cataLevel",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Show secrets",
-                ConfigElement(
-                    "betterPartyFinder.secrets",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Show secret average",
-                ConfigElement(
-                    "betterPartyFinder.secretAverage",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Show PB",
-                ConfigElement(
-                    "betterPartyFinder.pb",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Show missing classes",
-                ConfigElement(
-                    "betterPartyFinder.missingClasses",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Auto kick",
-                ConfigElement(
-                    "betterPartyFinder.autoKick",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Shitter list",
-                ConfigElement(
-                    "betterPartyFinder.shitterList",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Selected floor",
-                ConfigElement(
-                    "betterPartyFinder.selectedFloor",
-                    ElementType.Dropdown(listOf("F7", "M4", "M5", "M6", "M7"), 0)
-                )
-            )
-            .addFeatureOption(
-                "Required PB (5:30 or 330)",
-                ConfigElement(
-                    "betterPartyFinder.requiredPB",
-                    ElementType.TextInput("")
-                )
-            )
-            .addFeatureOption(
-                "Required secrets (50000 or 50k)",
-                ConfigElement(
-                    "betterPartyFinder.requiredSecrets",
-                    ElementType.TextInput("")
-                )
-            )
-            .addFeatureOption(
-                "Send kick message",
-                ConfigElement(
-                    "betterPartyFinder.kickMessage",
-                    ElementType.Switch(true)
-                )
-            )
-    }
-
     override fun initialize() {
-        if (!config.has("players")) config.add("players", JsonArray())
+        if (!jsonObject.has("players")) jsonObject.add("players", JsonArray())
 
-        config.get("players").asJsonArray.forEach { element ->
+        jsonObject.get("players").asJsonArray.forEach { element ->
             kickList.add(element.asString)
         }
 
@@ -302,7 +211,7 @@ object BetterPartyFinder : Feature(
     }
 
     fun save() {
-        val playersArray = config.getAsJsonArray("players")
+        val playersArray = jsonObject.getAsJsonArray("players")
 
         while (playersArray.size() > 0) {
             playersArray.remove(0)

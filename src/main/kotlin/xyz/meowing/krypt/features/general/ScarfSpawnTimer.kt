@@ -1,6 +1,5 @@
 package xyz.meowing.krypt.features.general
 
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.utils.rendering.Render3D
 import net.minecraft.world.phys.Vec3
@@ -10,12 +9,13 @@ import xyz.meowing.krypt.api.dungeons.enums.DungeonFloor
 import xyz.meowing.krypt.events.core.ChatEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.RenderEvent
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 
 @Module
 object ScarfSpawnTimer : Feature(
     "scarfSpawnTimers",
+    "Scarf spawn timers",
+    "Shows spawn timers for Scarf's minions and Scarf in dungeons",
+    "General",
     dungeonFloor = listOf(DungeonFloor.F2, DungeonFloor.M2)
 ) {
     private var time = 0.0
@@ -35,19 +35,6 @@ object ScarfSpawnTimer : Feature(
     )
 
     private val boss = listOf(TimerData("§6Scarf", 0.4, Vec3(-7.5, 72.0, -10.5)))
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Scarf spawn timers",
-                "Shows spawn timers for Scarf's minions and Scarf in dungeons",
-                "General",
-                ConfigElement(
-                    "scarfSpawnTimers",
-                    ElementType.Switch(false)
-                )
-            )
-    }
 
     override fun initialize() {
         createCustomEvent<RenderEvent.World.Last>("render") {

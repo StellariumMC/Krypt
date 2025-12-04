@@ -6,44 +6,29 @@ import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.GuiEvent
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.hud.HUDEditor
 import xyz.meowing.krypt.hud.HUDManager
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render2D
 import xyz.meowing.krypt.utils.rendering.Render2D.width
 
 @Module
 object RoomSecrets: Feature(
     "roomSecrets",
+    "Room secrets HUD",
+    "Shows the secrets in the current dungeon room",
+    "General",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private const val NAME = "Secrets Display"
 
-    override fun addConfig() {
-        ConfigManager
-        .addFeature("Room secrets HUD",
-            "Shows the secrets in the current dungeon room",
-            "General",
-            ConfigElement(
-                "roomSecrets",
-                ElementType.Switch(false)
-            )
-        )
-        .addFeatureOption(
-            "HudEditor",
-            ConfigElement(
-                "roomSecrets.hudEditor",
-                ElementType.Button("Edit Position") {
-                    TickScheduler.Client.post {
-                        client.execute { client.setScreen(HUDEditor()) }
-                    }
-                }
-            )
-        )
+    init {
+        config.button("Edit Position") {
+            TickScheduler.Client.post {
+                client.setScreen(HUDEditor())
+            }
+        }
     }
 
     override fun initialize() {
@@ -123,7 +108,6 @@ object RoomSecrets: Feature(
 
     private fun getText(): String {
         val room = DungeonAPI.currentRoom
-        //Krypt.LOGGER.info("Current room: ${room?.name}")
         val found = room?.secretsFound ?: 0
         val total = room?.secrets ?: 0
         var text: String

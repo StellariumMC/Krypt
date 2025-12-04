@@ -5,10 +5,7 @@ import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.text.buildText
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.data.StoredFile
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
+import xyz.meowing.krypt.config.dsl.Config
 import xyz.meowing.krypt.utils.Utils.toTimerFormat
 import xyz.meowing.krypt.utils.modMessage
 
@@ -20,27 +17,8 @@ object PuzzleTimer {
     private var lastPuzzleName: String? = null
     private var lastOldBest: Double? = null
 
-    private val useTrueTime by ConfigDelegate<Boolean>("puzzleTimer.useTrueTime")
-
-    init {
-        ConfigManager
-            .addFeature(
-                "Puzzle timer",
-                "Configure puzzle completion time tracking",
-                "Solvers",
-                ConfigElement(
-                    "puzzleTimer",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Use \"true\" time",
-                ConfigElement(
-                    "puzzleTimer.useTrueTime",
-                    ElementType.Switch(false)
-                )
-            )
-    }
+    private val puzzleTimer by Config("Puzzle timer", "Configure puzzle completion time tracking", "Solvers")
+    private val useTrueTime by puzzleTimer.switch("Use \"true\" time")
 
     fun getPersonalBest(puzzleName: String): Double? = pbMap[puzzleName]
 

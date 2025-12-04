@@ -14,8 +14,6 @@ import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.utils.ScanUtils
 import xyz.meowing.krypt.api.dungeons.utils.ScanUtils.getRealCoord
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.DungeonEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.PacketEvent
@@ -23,8 +21,6 @@ import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.features.solvers.data.PuzzleTimer
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.NetworkUtils
 import xyz.meowing.krypt.utils.modMessage
 import xyz.meowing.krypt.utils.rendering.Render3D
@@ -38,6 +34,9 @@ import java.awt.Color
 @Module
 object WaterBoardSolver : Feature(
     "waterBoardSolver",
+    "Water board solver",
+    "Shows optimal lever order and timing",
+    "Solvers",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private lateinit var waterSolutions: JsonObject
@@ -53,8 +52,8 @@ object WaterBoardSolver : Feature(
     private var trueTimeStarted: Long? = null
     private var timeStarted: Long? = null
 
-    private val firstTracerColor by ConfigDelegate<Color>("waterBoardSolver.firstColor")
-    private val secondTracerColor by ConfigDelegate<Color>("waterBoardSolver.secondColor")
+    private val firstColor by config.colorPicker("First tracer color", Color(0, 255, 0, 255))
+    private val secondTracerColor by config.colorPicker("Second tracer color", Color(255, 255, 0, 255))
 
     init {
         NetworkUtils.fetchJson<JsonObject>(
@@ -67,33 +66,6 @@ object WaterBoardSolver : Feature(
                 Krypt.LOGGER.error("Caught error while trying to load Water Board solutions: $error")
             }
         )
-    }
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Water board solver",
-                "Shows optimal lever order and timing",
-                "Solvers",
-                ConfigElement(
-                    "waterBoardSolver",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "First tracer color",
-                ConfigElement(
-                    "waterBoardSolver.firstColor",
-                    ElementType.ColorPicker(Color(0, 255, 0, 255))
-                )
-            )
-            .addFeatureOption(
-                "Second tracer color",
-                ConfigElement(
-                    "waterBoardSolver.secondColor",
-                    ElementType.ColorPicker(Color(255, 255, 0, 255))
-                )
-            )
     }
 
     override fun initialize() {
@@ -136,11 +108,11 @@ object WaterBoardSolver : Feature(
                 event.context.consumers(),
                 event.context.matrixStack(),
                 floatArrayOf(
-                    firstTracerColor.red / 255f,
-                    firstTracerColor.green / 255f,
-                    firstTracerColor.blue / 255f
+                    firstColor.red / 255f,
+                    firstColor.green / 255f,
+                    firstColor.blue / 255f
                 ),
-                firstTracerColor.alpha / 255f
+                firstColor.alpha / 255f
             )
 
             if (solutionList.size > 1) {

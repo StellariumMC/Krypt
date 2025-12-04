@@ -5,45 +5,23 @@ import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.EntityEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.glowThisFrame
 import xyz.meowing.krypt.utils.glowingColor
-import java.awt.Color
 
 @Module
 object StarMobHighlight : Feature(
     "starMobHighlight",
+    "Star mob highlight",
+    "Highlights starred mobs in dungeons",
+    "Highlights",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private val entities = mutableListOf<Int>()
-    private val starMobsColor by ConfigDelegate<Color>("starMobHighlight.color")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Star mob highlight",
-                "Highlights starred mobs in dungeons",
-                "Highlights",
-                ConfigElement(
-                    "starMobHighlight",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Color",
-                ConfigElement(
-                    "starMobHighlight.color",
-                    ElementType.ColorPicker(Color(0, 255, 255, 127))
-                )
-            )
-    }
+    private val starMobsColor by config.colorPicker("Color")
 
     override fun initialize() {
         register<EntityEvent.Join> { event ->

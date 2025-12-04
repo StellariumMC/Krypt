@@ -6,14 +6,10 @@ import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.EntityEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.Utils.toFloatArray
 import xyz.meowing.krypt.utils.rendering.Render3D
 import java.awt.Color
@@ -21,71 +17,19 @@ import java.awt.Color
 @Module
 object KeyHighlight : Feature(
     "keyHighlight",
+    "Key highlight",
+    "Highlight blood/wither door key in the world",
+    "Highlights",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
-    private val filled by ConfigDelegate<Boolean>("keyHighlight.filled")
-    private val outlined by ConfigDelegate<Boolean>("keyHighlight.outlined")
-    private val highlightWither by ConfigDelegate<Boolean>("keyHighlight.wither")
-    private val highlightBlood by ConfigDelegate<Boolean>("keyHighlight.blood")
-    private val witherColor by ConfigDelegate<Color>("keyHighlight.witherColor")
-    private val bloodColor by ConfigDelegate<Color>("keyHighlight.bloodColor")
+    private val filled by config.switch("Filled box")
+    private val outlined by config.switch("Outlined box", true)
+    private val highlightWither by config.switch("Highlight wither key", true)
+    private val highlightBlood by config.switch("Highlight blood key", true)
+    private val witherColor by config.colorPicker("Wither key color", Color(0, 0, 0, 255))
+    private val bloodColor by config.colorPicker("Blood key color", Color(255, 0, 0, 255))
 
     private var doorKey: Pair<Entity, Color>? = null
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Key highlight",
-                "Highlight blood/wither door key in the world",
-                "Highlights",
-                ConfigElement(
-                    "keyHighlight",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Wither key",
-                ConfigElement(
-                    "keyHighlight.wither",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Blood key",
-                ConfigElement(
-                    "keyHighlight.blood",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Filled box",
-                ConfigElement(
-                    "keyHighlight.filled",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Outlined box",
-                ConfigElement(
-                    "keyHighlight.outlined",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Wither key color",
-                ConfigElement(
-                    "keyHighlight.witherColor",
-                    ElementType.ColorPicker(Color(0, 0, 0, 255))
-                )
-            )
-            .addFeatureOption(
-                "Blood key color",
-                ConfigElement(
-                    "keyHighlight.bloodColor",
-                    ElementType.ColorPicker(Color(255, 0, 0, 255))
-                )
-            )
-    }
 
     override fun initialize() {
         register<EntityEvent.Packet.Metadata> { event ->

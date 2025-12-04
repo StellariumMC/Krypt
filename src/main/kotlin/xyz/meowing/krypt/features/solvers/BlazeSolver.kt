@@ -8,16 +8,12 @@ import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.utils.StringUtils.remove
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.DungeonEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.ClientTick
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.features.solvers.data.PuzzleTimer
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.glowThisFrame
 import xyz.meowing.krypt.utils.glowingColor
 import xyz.meowing.krypt.utils.rendering.Render3D
@@ -31,6 +27,9 @@ import java.awt.Color
 @Module
 object BlazeSolver : Feature(
     "blazeSolver",
+    "Blaze solver",
+    "Highlights blazes in order and tracks completion time",
+    "Solvers",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private val blazeHpRegex = Regex("^\\[Lv15].+Blaze [\\d,]+/([\\d,]+)❤$")
@@ -43,59 +42,11 @@ object BlazeSolver : Feature(
     private var trueTimeStarted: Long? = null
     private var timeStarted: Long? = null
 
-    private val blazeCount by ConfigDelegate<Double>("blazeSolver.count")
-    private val lineColor by ConfigDelegate<Color>("blazeSolver.lineColor")
-    private val firstBlazeColor by ConfigDelegate<Color>("blazeSolver.firstColor")
-    private val secondBlazeColor by ConfigDelegate<Color>("blazeSolver.secondColor")
-    private val thirdBlazeColor by ConfigDelegate<Color>("blazeSolver.thirdColor")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Blaze solver",
-                "Highlights blazes in order and tracks completion time",
-                "Solvers",
-                ConfigElement(
-                    "blazeSolver",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Number of blazes to show",
-                ConfigElement(
-                    "blazeSolver.count",
-                    ElementType.Slider(1.0, 10.0, 3.0, false)
-                )
-            )
-            .addFeatureOption(
-                "Line color",
-                ConfigElement(
-                    "blazeSolver.lineColor",
-                    ElementType.ColorPicker(Color(255, 255, 255, 255))
-                )
-            )
-            .addFeatureOption(
-                "First blaze color",
-                ConfigElement(
-                    "blazeSolver.firstColor",
-                    ElementType.ColorPicker(Color(0, 255, 0, 127))
-                )
-            )
-            .addFeatureOption(
-                "Second blaze color",
-                ConfigElement(
-                    "blazeSolver.secondColor",
-                    ElementType.ColorPicker(Color(255, 255, 0, 127))
-                )
-            )
-            .addFeatureOption(
-                "Third blaze color",
-                ConfigElement(
-                    "blazeSolver.thirdColor",
-                    ElementType.ColorPicker(Color(255, 165, 0, 127))
-                )
-            )
-    }
+    private val blazeCount by config.slider("Number of blazes to show", 3.0, 1.0, 10.0, false)
+    private val lineColor by config.colorPicker("Line color", Color(255, 255, 255, 255))
+    private val firstColor by config.colorPicker("First color", Color(0, 255, 0, 127))
+    private val secondColor by config.colorPicker("Second color", Color(0, 255, 0, 127))
+    private val thirdColor by config.colorPicker("Third color", Color(255, 165, 0, 127))
 
     override fun initialize() {
         setupLoops {
@@ -189,9 +140,9 @@ object BlazeSolver : Feature(
     }
 
     private fun getBlazeColor(index: Int) = when (index) {
-        0 -> firstBlazeColor
-        1 -> secondBlazeColor
-        else -> thirdBlazeColor
+        0 -> firstColor
+        1 -> secondColor
+        else -> thirdColor
     }
 
     private fun reset() {

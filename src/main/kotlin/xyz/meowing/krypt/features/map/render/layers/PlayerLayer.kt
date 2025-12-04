@@ -8,7 +8,6 @@ import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.enums.DungeonClass
 import xyz.meowing.krypt.api.dungeons.enums.DungeonPlayer
 import xyz.meowing.krypt.features.map.DungeonMap
-import xyz.meowing.krypt.features.map.render.MapRenderConfig
 import xyz.meowing.krypt.utils.rendering.Render2D
 import xyz.meowing.krypt.utils.rendering.Render2D.pushPop
 import xyz.meowing.krypt.utils.rendering.Render2D.width
@@ -31,7 +30,7 @@ object PlayerLayer {
             val y = iconY / 125.0 * 128.0
             val isOwnPlayer = player.name == KnitPlayer.name
 
-            if (DungeonAPI.holdingLeaps && MapRenderConfig.showPlayerNametags && (!isOwnPlayer || MapRenderConfig.showOwnPlayer)) {
+            if (DungeonAPI.holdingLeaps && DungeonMap.showPlayerNametags && (!isOwnPlayer || DungeonMap.showOwnPlayer)) {
                 renderNametag(context, player.name, x.toFloat(), y.toFloat())
             }
 
@@ -42,7 +41,7 @@ object PlayerLayer {
     private fun renderPlayerIcon(context: GuiGraphics, player: DungeonPlayer, x: Double, y: Double, rotation: Float, isOwnPlayer: Boolean) {
         context.pushPop {
             val matrix = context.pose()
-            val scale = MapRenderConfig.playerIconSize.toFloat()
+            val scale = DungeonMap.playerIconSize.toFloat()
 
             //#if MC >= 1.21.8
             //$$ matrix.translate(x.toFloat(), y.toFloat())
@@ -54,19 +53,19 @@ object PlayerLayer {
             matrix.scale(scale, scale, 1f)
             //#endif
 
-            val showAsArrow = MapRenderConfig.showOnlyOwnHeadAsArrow && isOwnPlayer
-            val showHead = MapRenderConfig.showPlayerHead && !showAsArrow
+            val showAsArrow = DungeonMap.showOnlyOwnHeadAsArrow && isOwnPlayer
+            val showHead = DungeonMap.showPlayerHead && !showAsArrow
 
             if (showHead) renderPlayerHead(context, player) else renderPlayerArrow(context, isOwnPlayer)
         }
     }
 
     private fun renderPlayerHead(context: GuiGraphics, player: DungeonPlayer) {
-        val borderColor = if (MapRenderConfig.iconClassColors) player.dungeonClass?.mapColor else MapRenderConfig.playerIconBorderColor
+        val borderColor = if (DungeonMap.iconClassColors) player.dungeonClass?.mapColor else DungeonMap.playerIconBorderColor
 
         Render2D.drawRect(context, -6, -6, 12, 12, borderColor ?: DungeonClass.defaultColor)
 
-        val borderSize = MapRenderConfig.playerIconBorderSize.toFloat()
+        val borderSize = DungeonMap.playerIconBorderSize.toFloat()
         context.pushPop {
             val matrix = context.pose()
             //#if MC >= 1.21.8

@@ -5,6 +5,7 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.decoration.ItemFrame
 import net.minecraft.world.item.MapItem
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
+import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket
 import net.minecraft.core.BlockPos
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.shapes.VoxelShape
@@ -15,16 +16,12 @@ import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.utils.ScanUtils
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.DungeonEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.PacketEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
-import xyz.meowing.krypt.utils.WorldUtils
+import xyz.meowing.krypt.features.solvers.data.PuzzleTimer
 import xyz.meowing.krypt.utils.rendering.Render3D
 import java.awt.Color
 import kotlin.experimental.and
@@ -40,6 +37,9 @@ import kotlin.math.min
 @Module
 object TicTacToeSolver : Feature(
     "ticTacToeSolver",
+    "Tic-Tac-Toe solver",
+    "Shows the best move using minimax algorithm",
+    "Solvers",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private var inTicTacToe = false
@@ -47,27 +47,10 @@ object TicTacToeSolver : Feature(
     private var boundingBox: VoxelShape? = null
     private var blockPos: BlockPos? = null
 
-    private val boxColor by ConfigDelegate<Color>("ticTacToeSolver.boxColor")
+    private var trueTimeStarted: Long? = null
+    private var timeStarted: Long? = null
 
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Tic-Tac-Toe solver",
-                "Shows the best move using minimax algorithm",
-                "Solvers",
-                ConfigElement(
-                    "ticTacToeSolver",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Box color",
-                ConfigElement(
-                    "ticTacToeSolver.boxColor",
-                    ElementType.ColorPicker(Color(0, 255, 0, 127))
-                )
-            )
-    }
+    private val boxColor by config.colorPicker("Box color", Color(0, 255, 0, 127))
 
     override fun initialize() {
         register<DungeonEvent.Room.Change> { event ->
@@ -75,6 +58,7 @@ object TicTacToeSolver : Feature(
 
             inTicTacToe = true
             roomCenter = ScanUtils.getRoomCenter(event.new)
+            trueTimeStarted = System.currentTimeMillis()
 
             TickScheduler.Server.schedule(2) {
                 scanBoard()
@@ -92,8 +76,27 @@ object TicTacToeSolver : Feature(
             val packet = event.packet as? ClientboundAddEntityPacket ?: return@register
             if (packet.type != EntityType.ITEM_FRAME) return@register
 
+            if (timeStarted == null) timeStarted = System.currentTimeMillis()
+
             TickScheduler.Server.schedule(5) {
                 scanBoard()
+            }
+        }
+
+        register<PacketEvent.Sent> { event ->
+            if (!inTicTacToe) return@register
+            val packet = event.packet as? ServerboundUseItemOnPacket ?: return@register
+            val pos = packet.hitResult.blockPos
+
+            if (client.level?.getBlockState(pos)?.block == Blocks.CHEST) {
+                val trueTime = trueTimeStarted ?: return@register
+                val startTime = timeStarted ?: return@register
+
+                val solveTime = (System.currentTimeMillis() - startTime).toDouble()
+                val totalTime = (System.currentTimeMillis() - trueTime).toDouble()
+
+                PuzzleTimer.submitTime("Tic Tac Toe", solveTime, totalTime)
+                reset()
             }
         }
 
@@ -294,5 +297,7 @@ object TicTacToeSolver : Feature(
         inTicTacToe = false
         boundingBox = null
         roomCenter = null
+        trueTimeStarted = null
+        timeStarted = null
     }
 }

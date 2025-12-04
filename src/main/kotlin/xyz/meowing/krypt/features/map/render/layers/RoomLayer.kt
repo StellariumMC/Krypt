@@ -3,7 +3,7 @@ package xyz.meowing.krypt.features.map.render.layers
 import net.minecraft.client.gui.GuiGraphics
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.enums.map.*
-import xyz.meowing.krypt.features.map.render.MapRenderConfig
+import xyz.meowing.krypt.features.map.DungeonMap
 import xyz.meowing.krypt.utils.rendering.Render2D
 import java.awt.Color
 
@@ -58,7 +58,7 @@ object RoomLayer {
             if (door.state != DoorState.DISCOVERED) return@forEach
 
             val type =
-                if (door.opened && !door.isFairyDoor && door.type == DoorType.WITHER && MapRenderConfig.changeDoorColorOnOpen) DoorType.NORMAL else door.type
+                if (door.opened && !door.isFairyDoor && door.type == DoorType.WITHER && DungeonMap.changeDoorColorOnOpen) DoorType.NORMAL else door.type
 
             val (cx, cy) = door.componentPos.let { it.first / 2 * SPACING to it.second / 2 * SPACING }
             val isVertical = door.rotation == 0

@@ -8,20 +8,19 @@ import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.dungeons.enums.DungeonFloor
 import xyz.meowing.krypt.api.dungeons.enums.DungeonPhase
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.events.core.WorldEvent
 import xyz.meowing.krypt.features.Feature
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render3D
 import java.awt.Color
 
 @Module
 object I4Helper : Feature(
     "i4Helper",
+    "I4 helper",
+    "Highlights blocks for the 4th device",
+    "Floor 7",
     dungeonFloor = listOf(DungeonFloor.F7, DungeonFloor.M7)
 ) {
     private val pressurePlate = BlockPos(63, 127, 35)
@@ -34,43 +33,9 @@ object I4Helper : Feature(
     private val completedTargets = mutableSetOf<AABB>()
     private var activeTarget: AABB? = null
 
-    private val completedColor by ConfigDelegate<Color>("i4Helper.completedColor")
-    private val activeColor by ConfigDelegate<Color>("i4Helper.activeColor")
-    private val renderThroughWalls by ConfigDelegate<Boolean>("i4Helper.renderThroughWalls")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "I4 helper",
-                "Highlights blocks for the 4th device",
-                "Floor 7",
-                ConfigElement(
-                    "i4Helper",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Completed target color",
-                ConfigElement(
-                    "i4Helper.completedColor",
-                    ElementType.ColorPicker(Color(255, 0, 0, 127))
-                )
-            )
-            .addFeatureOption(
-                "Active target color",
-                ConfigElement(
-                    "i4Helper.activeColor",
-                    ElementType.ColorPicker(Color(0, 255, 0, 127))
-                )
-            )
-            .addFeatureOption(
-                "Render through walls",
-                ConfigElement(
-                    "i4Helper.renderThroughWalls",
-                    ElementType.Switch(true)
-                )
-            )
-    }
+    private val completedColor by config.colorPicker("Completed target color", Color(255, 0, 0, 127))
+    private val activeColor by config.colorPicker("Active target color", Color(0, 255, 0, 127))
+    private val renderThroughWalls by config.switch("Render through walls", true)
 
     override fun initialize() {
         register<WorldEvent.BlockUpdate> { event ->

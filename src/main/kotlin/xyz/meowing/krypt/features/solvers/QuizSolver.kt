@@ -4,15 +4,11 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.core.BlockPos
 import net.minecraft.world.phys.AABB
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
-import xyz.meowing.knit.api.KnitClient.client
-import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.krypt.Krypt
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.utils.ScanUtils
 import xyz.meowing.krypt.api.dungeons.utils.ScanUtils.getRealCoord
 import xyz.meowing.krypt.api.location.SkyBlockIsland
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.core.ChatEvent
 import xyz.meowing.krypt.events.core.DungeonEvent
 import xyz.meowing.krypt.events.core.GuiEvent
@@ -21,10 +17,7 @@ import xyz.meowing.krypt.events.core.RenderEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.features.solvers.data.PuzzleTimer
-import xyz.meowing.krypt.hud.HUDEditor
 import xyz.meowing.krypt.hud.HUDManager
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.NetworkUtils
 import xyz.meowing.krypt.utils.Utils.toTimerFormat
 import xyz.meowing.krypt.utils.rendering.Render2D
@@ -34,6 +27,9 @@ import java.awt.Color
 @Module
 object QuizSolver : Feature(
     "quizSolver",
+    "Quiz solver",
+    "Highlights correct trivia answers",
+    "Solvers",
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private const val NAME = "Quiz Solver"
@@ -48,9 +44,9 @@ object QuizSolver : Feature(
     private var roomCenter: BlockPos? = null
     private var rotation: Int? = null
 
-    private val boxColor by ConfigDelegate<Color>("quizSolver.boxColor")
-    private val showBeam by ConfigDelegate<Boolean>("quizSolver.beam")
-    private val timer by ConfigDelegate<Boolean>("quizSolver.timer")
+    private val boxColor by config.colorPicker("Box color", Color(0, 255, 0, 127))
+    private val beam by config.switch("Show beam", true)
+    private val timer by config.switch("Timer")
 
     private var answerTime: Int = 0
     private var questionsStarted = false
@@ -67,50 +63,6 @@ object QuizSolver : Feature(
                 Krypt.LOGGER.error("Caught error while trying to load Quiz solutions: $error")
             }
         )
-    }
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Quiz solver",
-                "Highlights correct trivia answers",
-                "Solvers",
-                ConfigElement(
-                    "quizSolver",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Box color",
-                ConfigElement(
-                    "quizSolver.boxColor",
-                    ElementType.ColorPicker(Color(0, 255, 0, 127))
-                )
-            )
-            .addFeatureOption(
-                "Show beam",
-                ConfigElement(
-                    "quizSolver.beam",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Timer",
-                ConfigElement(
-                    "quizSolver.timer",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption("HudEditor",
-                ConfigElement(
-                    "quizSolver.hudEditor",
-                    ElementType.Button("Edit Timer Position") {
-                        TickScheduler.Client.post {
-                            client.execute { client.setScreen(HUDEditor()) }
-                        }
-                    }
-                )
-            )
     }
 
     override fun initialize() {
@@ -201,7 +153,7 @@ object QuizSolver : Feature(
                     false
                 )
 
-                if (showBeam) {
+                if (beam) {
                     Render3D.renderBeam(
                         event.context,
                         pos.x.toDouble(),
