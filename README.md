@@ -67,3 +67,9 @@ Krypt is a Dungeon-focused Quality of Life module for Hypixel Skyblock.
 - Star mob highlight
 - Teammate highlight
 - Wither highlight
+
+## Credits
+
+- Odin [[GitHub]](https://github.com/odtheking/OdinFabric/)
+- Skyblocker [[GitHub]](https://github.com/SkyblockerMod/Skyblocker/)
+- Stella [[GitHub]](https://github.com/Eclipse-5214/stella)
