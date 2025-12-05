@@ -3,11 +3,11 @@ package xyz.meowing.krypt.features.waypoints
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket
 import net.minecraft.world.item.component.CustomData
-import org.lwjgl.glfw.GLFW
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.api.input.KnitMouseButtons
 import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.location.SkyBlockIsland
@@ -121,7 +121,7 @@ object DungeonWaypoints : Feature(
         }
 
         register<MouseEvent.Click> { event ->
-            if (event.button != GLFW.GLFW_MOUSE_BUTTON_RIGHT || client.screen != null) return@register
+            if (event.button != KnitMouseButtons.RIGHT.code || client.screen != null) return@register
             val item = client.player?.mainHandItem ?: return@register
 
             item

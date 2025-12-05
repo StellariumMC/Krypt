@@ -11,8 +11,6 @@ import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.dungeons.DungeonAPI
 import xyz.meowing.krypt.api.location.SkyBlockIsland
 import xyz.meowing.krypt.api.skyblock.PetTracker
-import xyz.meowing.krypt.config.ConfigDelegate
-import xyz.meowing.krypt.config.ui.elements.base.ElementType
 import xyz.meowing.krypt.events.EventBus
 import xyz.meowing.krypt.events.core.ChatEvent
 import xyz.meowing.krypt.events.core.GuiEvent
@@ -20,8 +18,6 @@ import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.events.core.TickEvent
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.hud.HUDManager
-import xyz.meowing.krypt.managers.config.ConfigElement
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.utils.rendering.Render2D
 
 @Module
