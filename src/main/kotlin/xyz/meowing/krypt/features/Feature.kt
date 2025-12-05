@@ -69,6 +69,8 @@ open class Feature(
                 configCategory,
                 configDefault
             )
+
+            _configBuilder?.feature()
         }
     }
 

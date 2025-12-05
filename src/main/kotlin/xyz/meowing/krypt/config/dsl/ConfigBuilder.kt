@@ -24,7 +24,7 @@ class ConfigBuilder internal constructor(
         Handler(configKey, Boolean::class.java)
     }
 
-    private fun feature(): FeatureElement {
+    fun feature(): FeatureElement {
         if (featureElement == null) {
             featureElement = ConfigManager
                 .addFeature(
