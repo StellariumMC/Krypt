@@ -16,12 +16,15 @@ object LeapAlert : Feature(
     island = SkyBlockIsland.THE_CATACOMBS
 ) {
     private val leapRegex = "^You have teleported to (.+)".toRegex()
-    private val message by config.textInput("Message")
+    private val message by config.textInput("Message",  "Leaping to {name}")
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
-            val result = leapRegex.find(event.message.stripped)
-            if (result != null) KnitChat.sendCommand("pc $message ${result.groupValues[1]}")
+            val result = leapRegex.find(event.message.stripped) ?: return@register
+            val message = message
+                .replace("{name}", result.groupValues[1])
+
+            KnitChat.sendCommand("pc $message")
         }
     }
 }
