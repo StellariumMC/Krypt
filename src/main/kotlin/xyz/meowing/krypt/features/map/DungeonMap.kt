@@ -7,11 +7,18 @@ import xyz.meowing.krypt.annotations.Module
 import xyz.meowing.krypt.api.location.SkyBlockIsland
 import xyz.meowing.krypt.config.dsl.Config
 import xyz.meowing.krypt.config.ui.elements.MCColorCode
-import xyz.meowing.krypt.events.core.GuiEvent
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.features.map.render.MapRenderer
 import xyz.meowing.krypt.hud.HUDManager
 import java.awt.Color
+
+//#if MC >= 1.21.8
+//$$ import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
+//$$ import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
+//#else
+import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback
+import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer
+//#endif
 
 @Module
 object DungeonMap : Feature(
@@ -109,7 +116,23 @@ object DungeonMap : Feature(
             "dungeonMap"
         )
 
-        register<GuiEvent.Render.HUD> { event -> renderMap(event.context) }
+        //#if MC >= 1.21.7
+        //$$ HudElementRegistry.attachElementBefore(
+        //$$     VanillaHudElements.PLAYER_LIST,
+        //$$     ResourceLocation.fromNamespaceAndPath("krypt", "dungeon_map")
+        //$$ ) { context, _ ->
+        //$$     if (isEnabled()) renderMap(context)
+        //$$ }
+        //#else
+        HudLayerRegistrationCallback.EVENT.register(HudLayerRegistrationCallback { layeredDrawer ->
+            layeredDrawer.attachLayerBefore(
+                IdentifiedLayer.PLAYER_LIST,
+                ResourceLocation.fromNamespaceAndPath("krypt", "dungeon_map")
+            ) { context, _ ->
+                if (isEnabled()) renderMap(context)
+            }
+        })
+        //#endif
     }
 
     private fun renderMap(context: GuiGraphics) {
