@@ -11,6 +11,7 @@ import xyz.meowing.krypt.events.core.EntityEvent
 import xyz.meowing.krypt.events.core.LocationEvent
 import xyz.meowing.krypt.features.Feature
 import xyz.meowing.krypt.utils.TitleUtils.showTitle
+import java.util.UUID
 
 @Module
 object KeyAlert : Feature(
@@ -23,7 +24,7 @@ object KeyAlert : Feature(
     private val keyObtainedRegex = Regex("(?:\\[.+] ?)?(?<user>\\w+) has obtained (?<type>\\w+) Key!")
     private val keyPickedUpRegex = Regex("A (?<type>\\w+) Key was picked up!")
 
-    private var lastKeyID: Int? = null
+    private var lastKeyID: UUID? = null
 
     private val spawnAlert by config.switch("Spawn alert", true)
     private val pickUpAlert by config.switch("Pickup alert")
@@ -36,9 +37,9 @@ object KeyAlert : Feature(
 
             val entity = event.entity as? ArmorStand ?: return@register
 
-            if (lastKeyID == entity.id) return@register // why? to make it only send once for the entity
+            if (lastKeyID == entity.uuid) return@register // why? to make it only send once for the entity
 
-            lastKeyID = entity.id
+            lastKeyID = entity.uuid
 
             val name = entity.name?.stripped ?: return@register
 

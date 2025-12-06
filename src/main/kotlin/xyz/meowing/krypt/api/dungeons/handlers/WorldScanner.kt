@@ -74,11 +74,14 @@ object WorldScanner {
     fun scan() {
         if (availableComponents.isEmpty()) return
 
+        val world = KnitClient.world ?: return
+
         for (idx in availableComponents.indices.reversed()) {
             val (cx, cz, rxz) = availableComponents[idx]
             val (rx, rz) = rxz
 
             if (!WorldScanUtils.isChunkLoaded(rx, rz)) continue
+            if (world.getChunk(rx shr 4, rz shr 4).javaClass.simpleName == "FakeChunk") continue
 
             val height = WorldScanUtils.getHighestY(rx, rz) ?: continue
             availableComponents.removeAt(idx)

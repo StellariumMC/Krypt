@@ -12,9 +12,9 @@ import xyz.meowing.krypt.api.dungeons.enums.DungeonFloor
 import xyz.meowing.krypt.api.location.LocationAPI
 import xyz.meowing.krypt.api.location.SkyBlockArea
 import xyz.meowing.krypt.api.location.SkyBlockIsland
+import xyz.meowing.krypt.config.ConfigDelegate
 import xyz.meowing.krypt.config.dsl.ConfigBuilder
 import xyz.meowing.krypt.events.EventBus
-import xyz.meowing.krypt.managers.config.ConfigManager
 import xyz.meowing.krypt.managers.feature.FeatureManager
 
 open class Feature(
@@ -33,6 +33,7 @@ open class Feature(
     val timeHandles = mutableSetOf<TimeScheduler.Handle>()
     val timerIds = mutableSetOf<Long>()
     val namedEventCalls = mutableMapOf<String, EventCall>()
+    private val _key by ConfigDelegate<Boolean>(configKey ?: "")
     private var setupLoops: (() -> Unit)? = null
     private var isRegistered = false
 
@@ -76,9 +77,7 @@ open class Feature(
 
     private fun checkConfig(): Boolean {
         return try {
-            configKey?.let {
-                ConfigManager.getConfigValue(it) as? Boolean ?: false
-            } ?: true
+            _key
         } catch (e: Exception) {
             Krypt.LOGGER.warn("Caught exception in checkConfig(): $e")
             false
