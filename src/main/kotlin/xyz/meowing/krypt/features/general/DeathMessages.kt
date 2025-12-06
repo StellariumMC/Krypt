@@ -22,7 +22,7 @@ object DeathMessages : Feature(
                 .replace("{name}", event.player.name)
                 .replace("{count}", event.player.deaths.toString())
 
-            KnitChat.fakeMessage(message)
+            KnitChat.sendCommand("pc $message")
         }
     }
 }
