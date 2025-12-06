@@ -29,7 +29,7 @@ object Krypt : ClientModInitializer {
     val saveData = StoredFile("main/Main")
 
     @JvmStatic
-    val modInfo = KnitModInfo("krypt", "Krypt", "1.0.1")
+    val modInfo = KnitModInfo("krypt", "Krypt", "1.0.2")
 
     var sendModLoaded: Boolean by saveData.boolean("sendModLoaded", true)
 
